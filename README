@@ -4,7 +4,7 @@ The project build assumes a directory structure like this:
 
 src
 |
-+-include
++-common
 |
 +-apps
 |
