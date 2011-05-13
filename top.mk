@@ -14,10 +14,10 @@ OUTDIR_DBG = $(PLATFORM)/dbg
 OBJDIR_REL = $(OUTDIR_REL)/.build
 OBJDIR_DBG = $(OUTDIR_DBG)/.build
 ifeq ($(LOCALNAME),tests)
-	INCLUDES = -I.. -I$(ROOT)/common -I$(ROOT)/libs/libunittest++ $(DEPS:%=-I$(ROOT)/libs/lib%)
+	INCLUDES = -I.. -I$(ROOT)/common -I$(ROOT)/libs/libutpp $(DEPS:%=-I$(ROOT)/libs/lib%)
 	TESTOBJS_REL = $(wildcard ../$(OBJDIR_REL)/*.$(OBJ))
 	TESTOBJS_DBG = $(wildcard ../$(OBJDIR_DBG)/*.$(OBJ))
-	DEPS += unittest++
+	DEPS += utpp
 else
 	INCLUDES = -I$(ROOT)/common $(DEPS:%=-I$(ROOT)/libs/lib%)
 	TESTOBJS_REL =
