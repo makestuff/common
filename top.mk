@@ -28,20 +28,22 @@ DLLS_REL      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDI
 
 # Platform-specific stuff:
 ifeq ($(PLATFORM),linux)
-	CFLAGS         = -c -Wall -Wextra -Wstrict-prototypes -Wundef -std=c99 -pedantic-errors -Wno-missing-field-initializers $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$(OBJDIR_REL)/$<.lst $< -o $@
-	CPPFLAGS       = -c -Wall -Wextra -Wundef -std=c++98 -pedantic-errors $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$(OBJDIR_REL)/$<.lst $< -o $@
+	CFLAGS   := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers
+	CLINE     = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$(OBJDIR_REL)/$<.lst $< -o $@
+	CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c++98
+	CPPLINE   = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$(OBJDIR_REL)/$<.lst $< -o $@
 	ifeq ($(TYPE),lib)
 		TARGET      := $(LOCALNAME).a
 		GENLIBS_REL := (echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%); $(GENDEPS_REL))
 		LINK_REL    := ar cr $(OUTDIR_REL)/$(TARGET) $(OBJS_REL); for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
-		CC_REL       = gcc -fPIC -O3 $(CFLAGS)
-		CPP_REL      = g++ -fPIC -O3 $(CPPFLAGS)
+		CC_REL       = gcc -fPIC -O3 $(CLINE)
+		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
 	else ifeq ($(TYPE),dll)
 		TARGET      := $(LOCALNAME).so
 		GENLIBS_REL := echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%)
 		LINK_REL    := gcc -shared -Wl,-soname,$(TARGET) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)); for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
-		CC_REL       = gcc -fPIC -O3 $(CFLAGS)
-		CPP_REL      = g++ -fPIC -O3 $(CPPFLAGS)
+		CC_REL       = gcc -fPIC -O3 $(CLINE)
+		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
 	else ifeq ($(TYPE),exe)
 		ifeq ($(LOCALNAME),tests)
 			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2> /dev/null) -I$(ROOT)/libs/libutpp
@@ -55,8 +57,8 @@ ifeq ($(PLATFORM),linux)
 		TARGET      := $(LOCALNAME)
 		GENLIBS_REL := $(GENDEPS_REL)
 		LINK_REL    := g++ -Wl,--relax -Wl,--gc-sections -Wl,-Map=$(OBJDIR_REL)/$(TARGET).map,--cref -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)); strip $(OUTDIR_REL)/$(TARGET); for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
-		CC_REL       = gcc -O3 $(TESTINCS) $(CFLAGS)
-		CPP_REL      = g++ -O3 $(TESTINCS) $(CPPFLAGS)
+		CC_REL       = gcc -O3 $(TESTINCS) $(CLINE)
+		CPP_REL      = g++ -O3 $(TESTINCS) $(CPPLINE)
 	endif
 endif
 
