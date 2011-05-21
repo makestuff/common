@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef MAKESTUFF_H
+#define MAKESTUFF_H
 
 #ifndef __cplusplus
 	#ifdef WIN32
