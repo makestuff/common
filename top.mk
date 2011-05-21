@@ -1,3 +1,19 @@
+#
+# Copyright (C) 2011 Chris McClelland
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 # Determine platform:
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win32
@@ -27,43 +43,67 @@ OBJS_REL      := $(CC_SRCS:%.c=$(OBJDIR_REL)/%.$(OBJ)) $(CPP_SRCS:%.cpp=$(OBJDIR
 GENDEPS_REL   := for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/rel/libs.txt); do cat $$i 2> /dev/null; done
 DLLS_REL      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDIR_REL)/*.$(DLL)))
 
+# Debug config defines:
+OUTDIR_DBG    := $(PLATFORM)/dbg
+OBJDIR_DBG    := $(OUTDIR_DBG)/.build
+EXTRA_OBJ_DBG := $(foreach ESD,$(EXTRA_SRC_DIRS),$(OBJDIR_DBG)/$(ESD)) $(sort $(foreach ESD,$(EXTRA_CC_SRCS) $(EXTRA_CPP_SRCS),$(OBJDIR_DBG)/$(dir $(ESD))))
+OBJS_DBG      := $(CC_SRCS:%.c=$(OBJDIR_DBG)/%.$(OBJ)) $(CPP_SRCS:%.cpp=$(OBJDIR_DBG)/%.$(OBJ))
+GENDEPS_DBG   := for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/dbg/libs.txt); do cat $$i 2> /dev/null; done
+DLLS_DBG      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDIR_DBG)/*.$(DLL)))
+
 # Platform-specific stuff:
 ifeq ($(PLATFORM),linux)
 	ifeq ($(strip $(CFLAGS)),)
 		CFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers
 	endif
-	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$(OBJDIR_REL)/$<.lst $< -o $@
+	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(strip $(CPPFLAGS)),)
 		CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c++98
 	endif
-	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$(OBJDIR_REL)/$<.lst $< -o $@
+	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(TYPE),lib)
 		TARGET      := $(LOCALNAME).a
 		GENLIBS_REL := (echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%); $(GENDEPS_REL))
 		LINK_REL    := ar cr $(OUTDIR_REL)/$(TARGET) $(OBJS_REL); for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
 		CC_REL       = gcc -fPIC -O3 $(CLINE)
 		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
+		GENLIBS_DBG := (echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%); $(GENDEPS_DBG))
+		LINK_DBG    := ar cr $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG); for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		CC_DBG       = gcc -fPIC -g $(CLINE)
+		CPP_DBG      = g++ -fPIC -g $(CPPLINE)
 	else ifeq ($(TYPE),dll)
 		TARGET      := $(LOCALNAME).so
 		GENLIBS_REL := echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%)
 		LINK_REL    := gcc -shared -Wl,-soname,$(TARGET) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)); for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
 		CC_REL       = gcc -fPIC -O3 $(CLINE)
 		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
+		GENLIBS_DBG := echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%)
+		LINK_DBG    := gcc -shared -Wl,-soname,$(TARGET) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(shell $(GENDEPS_DBG)); for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		CC_DBG       = gcc -fPIC -g $(CLINE)
+		CPP_DBG      = g++ -fPIC -g $(CPPLINE)
 	else ifeq ($(TYPE),exe)
 		ifeq ($(LOCALNAME),tests)
 			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2> /dev/null) -I$(ROOT)/libs/libutpp
-			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(wildcard ../$(OBJDIR_REL)/*.$(OBJ))) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.a
+			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_REL) -name "*.$(OBJ)")) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.a
 			TESTEXE_REL  := $(OUTDIR_REL)/tests
+			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_DBG) -name "*.$(OBJ)")) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.a
+			TESTEXE_DBG  := $(OUTDIR_DBG)/tests
 		else
 			TESTINCS     :=
 			TESTOBJS_REL :=
 			TESTEXE_REL  :=
+			TESTOBJS_DBG :=
+			TESTEXE_DBG  :=
 		endif
 		TARGET      := $(LOCALNAME)
 		GENLIBS_REL := $(GENDEPS_REL)
 		LINK_REL    := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done; $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,--relax,--gc-sections,-Map=$(OBJDIR_REL)/$(TARGET).map,--cref,-rpath,\$$ORIGIN,-rpath-link,$(OUTDIR_REL) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) #; strip $(OUTDIR_REL)/$(TARGET)
 		CC_REL       = gcc -O3 $(TESTINCS) $(CLINE)
 		CPP_REL      = g++ -O3 $(TESTINCS) $(CPPLINE)
+		GENLIBS_DBG := $(GENDEPS_DBG)
+		LINK_DBG    := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done; $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,--relax,--gc-sections,-Map=$(OBJDIR_DBG)/$(TARGET).map,--cref,-rpath,\$$ORIGIN,-rpath-link,$(OUTDIR_DBG) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) #; strip $(OUTDIR_DBG)/$(TARGET)
+		CC_DBG       = gcc -g $(TESTINCS) $(CLINE)
+		CPP_DBG      = g++ -g $(TESTINCS) $(CPPLINE)
 	endif
 else ifeq ($(PLATFORM),win32)
 	ifeq ($(strip $(CFLAGS)),)
@@ -76,32 +116,48 @@ else ifeq ($(PLATFORM),win32)
 		LINK_REL    := lib -nologo -out:$(OUTDIR_REL)/$(TARGET) -ltcg $(OBJS_REL); for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
 		CC_REL       = cl -O2 -Oi $(CLINE) -DNDEBUG -D_LIB -FD -MD -Gy -GL -Zi -Fo$@ -Fd$(OUTDIR_REL)/$(LOCALNAME).pdb $<
 		CPP_REL      = $(CC_REL)
+		GENLIBS_DBG := (echo $(CWD)/$(OUTDIR_DBG)/$(LOCALNAME).lib; $(GENDEPS_DBG))
+		LINK_DBG    := lib -nologo -out:$(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG); for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		CC_DBG       = cl -Od $(CLINE) -D_DEBUG -D_LIB -Gm -RTC1 -MDd -ZI -Fo$@ -Fd$(OUTDIR_DBG)/$(LOCALNAME).pdb $<
+		CPP_DBG      = $(CC_DBG)
 	else ifeq ($(TYPE),dll)
 		TARGET      := $(LOCALNAME).dll
 		GENLIBS_REL := echo $(CWD)/$(OUTDIR_REL)/$(LOCALNAME).lib
 		LINK_REL    := link -OUT:$(OUTDIR_REL)/$(TARGET) -INCREMENTAL:NO -NOLOGO -DLL -MANIFEST -MANIFESTFILE:$(OUTDIR_REL)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -PDB:$(OUTDIR_REL)/$(LOCALNAME).pdb -SUBSYSTEM:WINDOWS -OPT:REF -OPT:ICF -LTCG -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_REL) $(shell $(GENDEPS_REL)) kernel32.lib user32.lib; mt.exe -nologo -manifest $(OUTDIR_REL)/$(TARGET).intermediate.manifest "-outputresource:$(OUTDIR_REL)/$(TARGET);\#2"; for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
 		CC_REL       = cl -O2 -Oi $(CLINE) -DNDEBUG -D_WINDOWS -D_USRDLL -D$(LOCALNAMEUPPER)_EXPORTS -D_WINDLL -GL -FD -MD -Gy -Zi -Fo$@ -Fd$(OUTDIR_REL)/ $<
 		CPP_REL      = $(CC_REL)
+		GENLIBS_DBG := echo $(CWD)/$(OUTDIR_DBG)/$(LOCALNAME).lib
+		LINK_DBG    := link -OUT:$(OUTDIR_DBG)/$(TARGET) -INCREMENTAL -NOLOGO -DLL -MANIFEST -MANIFESTFILE:$(OUTDIR_DBG)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -DEBUG -PDB:$(OUTDIR_DBG)/$(LOCALNAME).pdb -SUBSYSTEM:WINDOWS -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_DBG) $(shell $(GENDEPS_DBG)) kernel32.lib user32.lib; mt.exe -nologo -manifest $(OUTDIR_DBG)/$(TARGET).intermediate.manifest "-outputresource:$(OUTDIR_DBG)/$(TARGET);\#2"; for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		CC_DBG       = cl -Od $(CLINE) -D_DEBUG -D_WINDOWS -D_USRDLL -D$(LOCALNAMEUPPER)_EXPORTS -D_WINDLL -Gm -RTC1 -MDd -ZI -Fo$@ -Fd$(OUTDIR_DBG)/ $<
+		CPP_DBG      = $(CC_DBG)
 	else ifeq ($(TYPE),exe)
 		ifeq ($(LOCALNAME),tests)
 			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2> /dev/null) -I$(ROOT)/libs/libutpp
 			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(wildcard ../$(OBJDIR_REL)/*.$(OBJ))) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.lib
 			TESTEXE_REL  := $(OUTDIR_REL)/tests
+			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(wildcard ../$(OBJDIR_DBG)/*.$(OBJ))) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.lib
+			TESTEXE_DBG  := $(OUTDIR_DBG)/tests
 		else
 			TESTINCS     :=
 			TESTOBJS_REL :=
 			TESTEXE_REL  :=
+			TESTOBJS_DBG :=
+			TESTEXE_DBG  :=
 		endif
 		TARGET      := $(LOCALNAME).exe
 		GENLIBS_REL := $(GENDEPS_REL)
 		LINK_REL    := link -OUT:$(OUTDIR_REL)/$(TARGET) -INCREMENTAL:NO -NOLOGO -MANIFEST -MANIFESTFILE:$(OUTDIR_REL)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -PDB:$(OUTDIR_REL)/$(TARGET).pdb -SUBSYSTEM:CONSOLE -OPT:REF -OPT:ICF -LTCG -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) kernel32.lib user32.lib; mt.exe -nologo -manifest $(OUTDIR_REL)/$(TARGET).intermediate.manifest "-outputresource:$(OUTDIR_REL)/$(TARGET);\#1"; for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
 		CC_REL       = cl -O2 -Oi $(TESTINCS) $(CLINE) -DNDEBUG -D_CONSOLE -FD -MD -Gy -GL -Zi -Fo$@ -Fd$(OUTDIR_REL)/ $<
 		CPP_REL      = $(CC_REL)
+		GENLIBS_DBG := $(GENDEPS_DBG)
+		LINK_DBG    := link -OUT:$(OUTDIR_DBG)/$(TARGET) -INCREMENTAL -NOLOGO -MANIFEST -MANIFESTFILE:$(OUTDIR_DBG)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -DEBUG -PDB:$(OUTDIR_DBG)/$(TARGET).pdb -SUBSYSTEM:CONSOLE -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) kernel32.lib user32.lib; mt.exe -nologo -manifest $(OUTDIR_DBG)/$(TARGET).intermediate.manifest "-outputresource:$(OUTDIR_DBG)/$(TARGET);\#1"; for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		CC_DBG       = cl -Od $(TESTINCS) $(CLINE) -D_DEBUG -D_CONSOLE -Gm -RTC1 -MDd -ZI -Fo$@ -Fd$(OUTDIR_DBG)/ $<
+		CPP_DBG      = $(CC_DBG)
 	endif
 endif
 
 # Config-agnostic rules:
-all: $(PRE_BUILD) rel
+all: $(PRE_BUILD) rel dbg
 	@for i in $(SUBDIRS); do make -C $$i; done
 
 $(PLATFORM)/incs.txt: $(PLATFORM)
@@ -114,15 +170,17 @@ clean: FORCE
 FORCE:
 
 
+# All-config rules
+$(PLATFORM) $(OBJDIR_REL) $(OUTDIR_REL) $(EXTRA_OBJ_REL) $(OBJDIR_DBG) $(OUTDIR_DBG) $(EXTRA_OBJ_DBG):
+	mkdir -p $@
+
+
 # Release config rules:
 rel: $(PLATFORM)/incs.txt $(OUTDIR_REL)/libs.txt $(OBJDIR_REL) $(EXTRA_OBJ_REL) $(OUTDIR_REL)/$(TARGET)
 	$(TESTEXE_REL)
 
 $(OUTDIR_REL)/libs.txt: $(OUTDIR_REL)
 	($(GENLIBS_REL); $(GENEXTRALIBS_REL)) > $@
-
-$(PLATFORM) $(OBJDIR_REL) $(OUTDIR_REL) $(EXTRA_OBJ_REL):
-	mkdir -p $@
 
 $(OUTDIR_REL)/$(TARGET): $(OBJDIR_REL) $(OBJS_REL)
 	$(LINK_REL)
@@ -132,3 +190,20 @@ $(OBJDIR_REL)/%.$(OBJ) : %.c
 
 $(OBJDIR_REL)/%.$(OBJ) : %.cpp
 	$(CPP_REL)
+
+
+# Debug config rules:
+dbg: $(PLATFORM)/incs.txt $(OUTDIR_DBG)/libs.txt $(OBJDIR_DBG) $(EXTRA_OBJ_DBG) $(OUTDIR_DBG)/$(TARGET)
+	$(TESTEXE_DBG)
+
+$(OUTDIR_DBG)/libs.txt: $(OUTDIR_DBG)
+	($(GENLIBS_DBG); $(GENEXTRALIBS_DBG)) > $@
+
+$(OUTDIR_DBG)/$(TARGET): $(OBJDIR_DBG) $(OBJS_DBG)
+	$(LINK_DBG)
+
+$(OBJDIR_DBG)/%.$(OBJ) : %.c
+	$(CC_DBG)
+
+$(OBJDIR_DBG)/%.$(OBJ) : %.cpp
+	$(CPP_DBG)
