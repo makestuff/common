@@ -14,7 +14,6 @@ wget 'http://prdownloads.sourceforge.net/mingw/msysCORE-1.0.17-1-msys-1.0.17-bin
 wget 'http://prdownloads.sourceforge.net/mingw/termcap-0.20050421_1-2-msys-1.0.13-bin.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/bzip2-1.0.5-2-msys-1.0.13-bin.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/bash-3.1.17-4-msys-1.0.16-bin.tar.lzma?download'
-wget 'http://prdownloads.sourceforge.net/mingw/rxvt-2.7.2-3-msys-1.0.14-bin.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/wget-1.12-1-msys-1.0.13-bin.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/patch-2.6.1-1-msys-1.0.13-bin.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/unzip-6.0-1-msys-1.0.13-bin.tar.lzma?download'
@@ -66,12 +65,10 @@ cp unpack/bin/msys-intl-8.dll ../msys/bin/
 cp unpack/bin/msys-regex-1.dll ../msys/bin/
 cp unpack/bin/msys-ssl-1.0.0.dll ../msys/bin/
 cp unpack/bin/msys-termcap-0.dll ../msys/bin/
-cp unpack/bin/msys-W11.dll ../msys/bin/
 cp unpack/bin/mv.exe ../msys/bin/
 cp unpack/bin/patch.exe ../msys/bin/
 cp unpack/bin/pwd.exe ../msys/bin/
 cp unpack/bin/rm.exe ../msys/bin/
-cp unpack/bin/rxvt.exe ../msys/bin/
 cp unpack/bin/sh.exe ../msys/bin/
 cp unpack/bin/tail.exe ../msys/bin/
 cp unpack/bin/tar.exe ../msys/bin/
