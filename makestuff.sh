@@ -17,6 +17,6 @@ cd ..
 zip -r makestuff-win32-${DATE}.zip makestuff
 mv makestuff-win32-${DATE}.zip /mnt/ukfsn/bin/
 rm -rf makestuff/msys
-tar zcf makestuff-linux-${DATE}.tar,gz makestuff
+tar zcf makestuff-linux-${DATE}.tar.gz makestuff
 mv makestuff-linux-${DATE}.tar.gz /mnt/ukfsn/bin/
 rm -rf makestuff
