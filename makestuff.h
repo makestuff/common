@@ -20,7 +20,7 @@
 
 #ifndef __cplusplus
 	#ifdef WIN32
-		typedef int bool;
+		typedef char bool;
 		enum {
 			false = 0,
 			true = 1
