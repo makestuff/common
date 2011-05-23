@@ -22,6 +22,7 @@ wget 'http://prdownloads.sourceforge.net/mingw/libintl-0.17-2-msys-dll-8.tar.lzm
 wget 'http://prdownloads.sourceforge.net/mingw/libregex-1.20090805-2-msys-1.0.13-dll-1.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/libtermcap-0.20050421_1-2-msys-1.0.13-dll-0.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/libopenssl-1.0.0-1-msys-1.0.13-dll-100.tar.lzma?download'
+wget 'http://prdownloads.sourceforge.net/mingw/sed-4.2.1-2-msys-1.0.13-bin.tar.lzma?download'
 rm -rf unpack ../msys
 mkdir -p unpack
 cd unpack/
@@ -43,6 +44,18 @@ export INCLUDE="C:/Program Files/Microsoft Visual Studio \$MSVC/VC/INCLUDE;C:/Pr
 export LIB="C:/Program Files/Microsoft Visual Studio \$MSVC/VC/LIB;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/lib"
 export PATH="/bin:/c/Program Files/Microsoft Visual Studio \$MSVC/Common7/IDE:/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK/bin:/c/Program Files/Microsoft Visual Studio \$MSVC/VC/bin:.:\$PATH"
 export PS1="\${USERNAME}@\${HOSTNAME}\$ "
+EOF
+cat > ../msys/README <<EOF
+This directory contains a minimal build system comprising MinGW binaries downloaded from SourceForge,
+where you can get copies of the software licenses and source code for these binaries. I have packaged
+it like this purely for your convenience; you can construct your own copy of this by running the
+makestuff.sh script on a GNU-like machine:
+
+  https://github.com/makestuff/common/raw/master/makestuff.sh
+
+To use, you should unpack the "makestuff" directory to C:/ and make a desktop shortcut to
+C:\makestuff\msys\bin\sh.exe --login. The resulting command prompt assumes you have Microsoft Visual
+Studio Express 2010 installed. If you want to use VS2008, edit etc/profile.
 EOF
 cp unpack/bin/bunzip2.exe ../msys/bin/
 cp unpack/bin/bzip2.exe ../msys/bin/
@@ -84,6 +97,6 @@ cp unpack/etc/termcap ../msys/etc/
 cp unpack/etc/wgetrc ../msys/etc/
 cd ..
 rm -rf all
-cp -rp build-msys.sh msys/
+#cp -rp build-msys.sh msys/
 #zip -r msys.zip msys
 #rm -rf msys
