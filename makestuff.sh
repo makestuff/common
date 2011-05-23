@@ -1,6 +1,5 @@
 #!/bin/bash
 export DATE=$(date +%Y%m%d)
-cd ${HOME}
 mkdir makestuff
 cd makestuff
 wget -O common.tar.gz --no-check-certificate https://github.com/makestuff/common/tarball/master
