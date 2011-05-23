@@ -52,6 +52,7 @@ cp unpack/bin/cp.exe ../msys/bin/
 cp unpack/bin/dd.exe ../msys/bin/
 cp unpack/bin/diff.exe ../msys/bin/
 cp unpack/bin/dirname.exe ../msys/bin/
+cp unpack/bin/echo.exe ../msys/bin/
 cp unpack/bin/find.exe ../msys/bin/
 cp unpack/bin/grep.exe ../msys/bin/
 cp unpack/bin/gunzip ../msys/bin/
