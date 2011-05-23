@@ -71,6 +71,7 @@ cp unpack/bin/mv.exe ../msys/bin/
 cp unpack/bin/patch.exe ../msys/bin/
 cp unpack/bin/pwd.exe ../msys/bin/
 cp unpack/bin/rm.exe ../msys/bin/
+cp unpack/bin/sed.exe ../msys/bin/
 cp unpack/bin/sh.exe ../msys/bin/
 cp unpack/bin/tail.exe ../msys/bin/
 cp unpack/bin/tar.exe ../msys/bin/
