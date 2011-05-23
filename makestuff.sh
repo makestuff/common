@@ -13,6 +13,7 @@ mv msys ..
 cd ..
 mkdir libs
 mkdir apps
+mkdir 3rd
 cd ..
 zip -r makestuff-win32-${DATE}.zip makestuff
 mv makestuff-win32-${DATE}.zip /mnt/ukfsn/bin/

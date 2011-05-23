@@ -30,6 +30,7 @@ cd ..
 mkdir -p ../msys
 mkdir -p ../msys/bin
 mkdir -p ../msys/etc
+mkdir -p ../msys/var/tmp
 cat > ../msys/etc/profile <<EOF
 # For Visual Studio Express 2010:
 export MSVC=10.0
