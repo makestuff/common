@@ -207,9 +207,6 @@ FORCE:
 deps: $(DEPDIRS:%=%/$(PLATFORM))
 	make
 
-$(ROOT)/libs/lib%/$(PLATFORM):
-	make -C $(dir $@) deps
-
 depclean: $(DEPDIRS) clean
 	@for i in $(DEPDIRS); do make -C $$i clean; done
 
@@ -267,8 +264,12 @@ $(ROOT)/3rd/libusb-win32-bin-%:
 	rm libusb-win32.zip
 	mv $(@F) $(ROOT)/3rd/
 
-$(ROOT)/libs/%:
-	wget -O $(@F).tgz --no-check-certificate https://github.com/makestuff/$(@F)/tarball/master
-	tar xvzf $(@F).tgz
-	rm $(@F).tgz
-	mv makestuff-$(@F)-* $(ROOT)/libs/
+$(ROOT)/libs/lib%/Makefile:
+	@echo Fetching $(notdir $(@D)) from GitHub...
+	wget -O $(notdir $(@D)).tgz --no-check-certificate https://github.com/makestuff/$(notdir $(@D))/tarball/master
+	tar xvzf $(notdir $(@D)).tgz
+	rm $(notdir $(@D)).tgz
+	mv makestuff-$(notdir $(@D))-* $(ROOT)/libs/$(notdir $(@D))
+
+$(ROOT)/libs/lib%/$(PLATFORM): $(ROOT)/libs/lib%/Makefile
+	make -C $(dir $<) deps
