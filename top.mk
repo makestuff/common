@@ -273,3 +273,5 @@ $(ROOT)/libs/lib%/Makefile:
 
 $(ROOT)/libs/lib%/$(PLATFORM): $(ROOT)/libs/lib%/Makefile
 	make -C $(dir $<) deps
+
+.PRECIOUS: $(ROOT)/libs/lib%/Makefile
