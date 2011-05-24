@@ -149,13 +149,13 @@ else ifeq ($(PLATFORM),win32)
 		LINK1_REL   := link -OUT:$(OUTDIR_REL)/$(TARGET) -INCREMENTAL:NO -NOLOGO -DLL -MANIFEST -MANIFESTFILE:$(OUTDIR_REL)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -PDB:$(OUTDIR_REL)/$(LOCALNAME).pdb -SUBSYSTEM:WINDOWS -OPT:REF -OPT:ICF -LTCG -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_REL) $(shell $(GENDEPS_REL)) kernel32.lib user32.lib
 		LINK2_REL   := mt.exe -nologo -manifest $(OUTDIR_REL)/$(TARGET).intermediate.manifest "-outputresource:$(OUTDIR_REL)/$(TARGET);\#2"
 		LINK3_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
-		CC_REL       = cl -O2 -Oi $(CLINE) -DNDEBUG -D_WINDOWS -D_USRDLL -D$(LOCALNAMEUPPER)_EXPORTS -D_WINDLL -GL -FD -MD -Gy -Zi -Fo$@ -Fd$(OUTDIR_REL)/ $<
+		CC_REL       = cl -O2 -Oi $(CLINE) -DNDEBUG -D_WINDOWS -D_USRDLL -D$(LOCALNAMEUPPER)_EXPORTS -D_WINDLL -GL -FD -MD -Gy -Zi -Fo$@ -Fd$(OUTDIR_REL)/$(LOCALNAME).pdb $<
 		CPP_REL      = $(CC_REL)
 		GENLIBS_DBG := echo $(CWD)/$(OUTDIR_DBG)/$(LOCALNAME).lib
 		LINK1_DBG   := link -OUT:$(OUTDIR_DBG)/$(TARGET) -INCREMENTAL -NOLOGO -DLL -MANIFEST -MANIFESTFILE:$(OUTDIR_DBG)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -DEBUG -PDB:$(OUTDIR_DBG)/$(LOCALNAME).pdb -SUBSYSTEM:WINDOWS -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_DBG) $(shell $(GENDEPS_DBG)) kernel32.lib user32.lib
 		LINK2_DBG   := mt.exe -nologo -manifest $(OUTDIR_DBG)/$(TARGET).intermediate.manifest "-outputresource:$(OUTDIR_DBG)/$(TARGET);\#2"
 		LINK3_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
-		CC_DBG       = cl -Od $(CLINE) -D_DEBUG -D_WINDOWS -D_USRDLL -D$(LOCALNAMEUPPER)_EXPORTS -D_WINDLL -Gm -RTC1 -MDd -ZI -Fo$@ -Fd$(OUTDIR_DBG)/ $<
+		CC_DBG       = cl -Od $(CLINE) -D_DEBUG -D_WINDOWS -D_USRDLL -D$(LOCALNAMEUPPER)_EXPORTS -D_WINDLL -Gm -RTC1 -MDd -ZI -Fo$@ -Fd$(OUTDIR_DBG)/$(LOCALNAME).pdb $<
 		CPP_DBG      = $(CC_DBG)
 	else ifeq ($(TYPE),exe)
 		ifeq ($(LOCALNAME),tests)
@@ -176,16 +176,16 @@ else ifeq ($(PLATFORM),win32)
 		endif
 		TARGET      := $(LOCALNAME).exe
 		GENLIBS_REL := $(GENDEPS_REL)
-		LINK1_REL   := link -OUT:$(OUTDIR_REL)/$(TARGET) -INCREMENTAL:NO -NOLOGO -MANIFEST -MANIFESTFILE:$(OUTDIR_REL)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -PDB:$(OUTDIR_REL)/$(TARGET).pdb -SUBSYSTEM:CONSOLE -OPT:REF -OPT:ICF -LTCG -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) kernel32.lib user32.lib
+		LINK1_REL   := link -OUT:$(OUTDIR_REL)/$(TARGET) -INCREMENTAL:NO -NOLOGO -MANIFEST -MANIFESTFILE:$(OUTDIR_REL)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -PDB:$(OUTDIR_REL)/$(LOCALNAME).pdb -SUBSYSTEM:CONSOLE -OPT:REF -OPT:ICF -LTCG -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) kernel32.lib user32.lib
 		LINK2_REL   := mt.exe -nologo -manifest $(OUTDIR_REL)/$(TARGET).intermediate.manifest "-outputresource:$(OUTDIR_REL)/$(TARGET);\#1"
 		LINK3_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
-		CC_REL       = cl -O2 -Oi $(TESTINCS) $(CLINE) -DNDEBUG -D_CONSOLE -FD -MD -Gy -GL -Zi -Fo$@ -Fd$(OUTDIR_REL)/ $<
+		CC_REL       = cl -O2 -Oi $(TESTINCS) $(CLINE) -DNDEBUG -D_CONSOLE -FD -MD -Gy -GL -Zi -Fo$@ -Fd$(OUTDIR_REL)/$(LOCALNAME).pdb $<
 		CPP_REL      = $(CC_REL)
 		GENLIBS_DBG := $(GENDEPS_DBG)
-		LINK1_DBG   := link -OUT:$(OUTDIR_DBG)/$(TARGET) -INCREMENTAL -NOLOGO -MANIFEST -MANIFESTFILE:$(OUTDIR_DBG)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -DEBUG -PDB:$(OUTDIR_DBG)/$(TARGET).pdb -SUBSYSTEM:CONSOLE -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) kernel32.lib user32.lib
+		LINK1_DBG   := link -OUT:$(OUTDIR_DBG)/$(TARGET) -INCREMENTAL -NOLOGO -MANIFEST -MANIFESTFILE:$(OUTDIR_DBG)/$(TARGET).intermediate.manifest -MANIFESTUAC:"level='asInvoker' uiAccess='false'" -DEBUG -PDB:$(OUTDIR_DBG)/$(LOCALNAME).pdb -SUBSYSTEM:CONSOLE -DYNAMICBASE -NXCOMPAT -MACHINE:X86 -ERRORREPORT:PROMPT $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) kernel32.lib user32.lib
 		LINK2_DBG   := mt.exe -nologo -manifest $(OUTDIR_DBG)/$(TARGET).intermediate.manifest "-outputresource:$(OUTDIR_DBG)/$(TARGET);\#1"
 		LINK3_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
-		CC_DBG       = cl -Od $(TESTINCS) $(CLINE) -D_DEBUG -D_CONSOLE -Gm -RTC1 -MDd -ZI -Fo$@ -Fd$(OUTDIR_DBG)/ $<
+		CC_DBG       = cl -Od $(TESTINCS) $(CLINE) -D_DEBUG -D_CONSOLE -Gm -RTC1 -MDd -ZI -Fo$@ -Fd$(OUTDIR_DBG)/$(LOCALNAME).pdb $<
 		CPP_DBG      = $(CC_DBG)
 	endif
 endif
