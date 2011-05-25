@@ -198,7 +198,7 @@ $(PLATFORM)/incs.txt: $(PLATFORM)
 	$(GENINCS) > $@
 
 clean: FORCE
-	@for i in $(SUBDIRS); do make -C $$i clean; done
+	@for i in $(SUBDIRS) $(EXTRA_CLEAN_DIRS); do make -C $$i clean; done
 	rm -rf $(PLATFORM) $(EXTRA_CLEAN)
 
 FORCE:
