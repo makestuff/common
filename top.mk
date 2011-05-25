@@ -99,9 +99,9 @@ ifeq ($(PLATFORM),linux)
 			ifneq ($(notdir $(realpath ..)),libutpp)
 				PRE_BUILD    := $(ROOT)/libs/libutpp/$(PLATFORM) $(PRE_BUILD)
 			endif
-			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_REL) -name "*.$(OBJ)")) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.a
+			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_REL) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.a
 			TESTEXE_REL  := $(OUTDIR_REL)/tests
-			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_DBG) -name "*.$(OBJ)")) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.a
+			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_DBG) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.a
 			TESTEXE_DBG  := $(OUTDIR_DBG)/tests
 		else
 			TESTINCS     :=
