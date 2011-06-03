@@ -62,11 +62,11 @@ DLLS_DBG      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDI
 # Platform-specific stuff:
 ifeq ($(PLATFORM),linux)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers
+		CFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers $(EXTRA_CFLAGS)
 	endif
 	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c++98
+		CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c++98 $(EXTRA_CPPFLAGS)
 	endif
 	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(TYPE),lib)
@@ -130,7 +130,7 @@ ifeq ($(PLATFORM),linux)
 	endif
 else ifeq ($(PLATFORM),win32)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -DWIN32 -D_CRT_SECURE_NO_WARNINGS -EHsc -W4 -nologo -c -errorReport:prompt
+		CFLAGS := -DWIN32 -D_CRT_SECURE_NO_WARNINGS -EHsc -W4 -nologo -c -errorReport:prompt  $(EXTRA_CFLAGS)
 	endif
 	CLINE := $(CFLAGS) $(INCLUDES)
 	ifeq ($(TYPE),lib)
