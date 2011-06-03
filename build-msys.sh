@@ -81,7 +81,7 @@ cp unpack/bin/msys-regex-1.dll ../msys/bin/
 cp unpack/bin/msys-ssl-1.0.0.dll ../msys/bin/
 cp unpack/bin/msys-termcap-0.dll ../msys/bin/
 cp unpack/bin/mv.exe ../msys/bin/
-cp unpack/bin/patch.exe ../msys/bin/
+cp unpack/bin/patch.exe ../msys/bin/paatch.exe
 cp unpack/bin/pwd.exe ../msys/bin/
 cp unpack/bin/rm.exe ../msys/bin/
 cp unpack/bin/sed.exe ../msys/bin/
