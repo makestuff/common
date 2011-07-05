@@ -23,14 +23,18 @@ ifeq ($(OS),Windows_NT)
 else
 	PLATFORM := $(shell uname | tr [A-Z] [a-z])
 	OBJ      := o
-	DLL      := so
 	EXE      := 
+	ifeq ($(PLATFORM),darwin)
+		DLL  := dylib
+	else
+		DLL  := so
+	endif
 endif
 
 # Config-agnostic defines:
 CWD       := $(realpath .)
 LOCALNAME := $(notdir $(CWD))
-INCLUDES  := -I$(ROOT)/common $(EXTRA_INCS) $(shell for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/incs.txt); do cat $$i 2> /dev/null; done)
+INCLUDES  := -I$(ROOT)/common $(EXTRA_INCS) $(shell for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/incs.txt); do cat $$i 2>/dev/null; done)
 ifeq ($(strip $(CC_SRCS)),)
 	CC_SRCS   := $(wildcard *.c) $(foreach ESD,$(EXTRA_SRC_DIRS),$(wildcard $(ESD)/*.c)) $(EXTRA_CC_SRCS)
 endif
@@ -48,7 +52,7 @@ OUTDIR_REL    := $(PLATFORM)/rel
 OBJDIR_REL    := $(OUTDIR_REL)/.build
 EXTRA_OBJ_REL := $(foreach ESD,$(EXTRA_SRC_DIRS),$(OBJDIR_REL)/$(ESD)) $(sort $(foreach ESD,$(EXTRA_CC_SRCS) $(EXTRA_CPP_SRCS),$(OBJDIR_REL)/$(dir $(ESD))))
 OBJS_REL      := $(CC_SRCS:%.c=$(OBJDIR_REL)/%.$(OBJ)) $(CPP_SRCS:%.cpp=$(OBJDIR_REL)/%.$(OBJ))
-GENDEPS_REL   := for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/rel/libs.txt); do cat $$i 2> /dev/null; done
+GENDEPS_REL   := for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/rel/libs.txt); do cat $$i 2>/dev/null; done
 DLLS_REL      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDIR_REL)/*.$(DLL)))
 
 # Debug config defines:
@@ -56,17 +60,17 @@ OUTDIR_DBG    := $(PLATFORM)/dbg
 OBJDIR_DBG    := $(OUTDIR_DBG)/.build
 EXTRA_OBJ_DBG := $(foreach ESD,$(EXTRA_SRC_DIRS),$(OBJDIR_DBG)/$(ESD)) $(sort $(foreach ESD,$(EXTRA_CC_SRCS) $(EXTRA_CPP_SRCS),$(OBJDIR_DBG)/$(dir $(ESD))))
 OBJS_DBG      := $(CC_SRCS:%.c=$(OBJDIR_DBG)/%.$(OBJ)) $(CPP_SRCS:%.cpp=$(OBJDIR_DBG)/%.$(OBJ))
-GENDEPS_DBG   := for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/dbg/libs.txt); do cat $$i 2> /dev/null; done
+GENDEPS_DBG   := for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/dbg/libs.txt); do cat $$i 2>/dev/null; done
 DLLS_DBG      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDIR_DBG)/*.$(DLL)))
 
 # Platform-specific stuff:
 ifeq ($(PLATFORM),linux)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers $(EXTRA_CFLAGS)
+		CFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS)
 	endif
 	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c++98 $(EXTRA_CPPFLAGS)
+		CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS)
 	endif
 	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(TYPE),lib)
@@ -99,7 +103,7 @@ ifeq ($(PLATFORM),linux)
 		CPP_DBG      = g++ -fPIC -g $(CPPLINE)
 	else ifeq ($(TYPE),exe)
 		ifeq ($(LOCALNAME),tests)
-			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2> /dev/null) -I$(ROOT)/libs/libutpp
+			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2>/dev/null) -I$(ROOT)/libs/libutpp
 			ifneq ($(notdir $(realpath ..)),libutpp)
 				PRE_BUILD    := $(ROOT)/libs/libutpp/$(PLATFORM) $(PRE_BUILD)
 			endif
@@ -124,6 +128,74 @@ ifeq ($(PLATFORM),linux)
 		GENLIBS_DBG := $(GENDEPS_DBG)
 		LINK1_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
 		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,--relax,--gc-sections,-Map=$(OBJDIR_DBG)/$(TARGET).map,--cref,-rpath,\$$ORIGIN,-rpath-link,$(OUTDIR_DBG) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
+		LINK3_DBG   := 
+		CC_DBG       = gcc -g $(TESTINCS) $(CLINE)
+		CPP_DBG      = g++ -g $(TESTINCS) $(CPPLINE)
+	endif
+else ifeq ($(PLATFORM),darwin)
+	ifeq ($(strip $(CFLAGS)),)
+		CFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS)
+	endif
+	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d $< -o $@
+	ifeq ($(strip $(CPPFLAGS)),)
+		CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS)
+	endif
+	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d $< -o $@
+	ifeq ($(TYPE),lib)
+		TARGET      := $(LOCALNAME).a
+		GENLIBS_REL := (echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%); $(GENDEPS_REL))
+		LINK1_REL   := ar cr $(OUTDIR_REL)/$(TARGET) $(OBJS_REL)
+		LINK2_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
+		LINK3_REL   := 
+		CC_REL       = gcc -fPIC -O3 $(CLINE)
+		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
+		GENLIBS_DBG := (echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%); $(GENDEPS_DBG))
+		LINK1_DBG   := ar cr $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG)
+		LINK2_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		LINK3_DBG   := 
+		CC_DBG       = gcc -fPIC -g $(CLINE)
+		CPP_DBG      = g++ -fPIC -g $(CPPLINE)
+	else ifeq ($(TYPE),dll)
+		TARGET      := $(LOCALNAME).dylib
+		GENLIBS_REL := echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%)
+		LINK1_REL   := gcc -dynamiclib -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
+		LINK2_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
+		LINK3_REL   := 
+		CC_REL       = gcc -fPIC -O3 $(CLINE)
+		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
+		GENLIBS_DBG := echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%)
+		LINK1_DBG   := gcc -dynamiclib -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
+		LINK2_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		LINK3_DBG   := 
+		CC_DBG       = gcc -fPIC -g $(CLINE)
+		CPP_DBG      = g++ -fPIC -g $(CPPLINE)
+	else ifeq ($(TYPE),exe)
+		ifeq ($(LOCALNAME),tests)
+			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2>/dev/null) -I$(ROOT)/libs/libutpp
+			ifneq ($(notdir $(realpath ..)),libutpp)
+				PRE_BUILD    := $(ROOT)/libs/libutpp/$(PLATFORM) $(PRE_BUILD)
+			endif
+			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_REL) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.a
+			TESTEXE_REL  := $(OUTDIR_REL)/tests
+			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_DBG) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.a
+			TESTEXE_DBG  := $(OUTDIR_DBG)/tests
+		else
+			TESTINCS     :=
+			TESTOBJS_REL :=
+			TESTEXE_REL  :=
+			TESTOBJS_DBG :=
+			TESTEXE_DBG  :=
+		endif
+		TARGET      := $(LOCALNAME)
+		GENLIBS_REL := $(GENDEPS_REL)
+		LINK1_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
+		LINK2_REL   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,-rpath,\$$ORIGIN:$(OUTDIR_REL) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
+		LINK3_REL   := strip $(OUTDIR_REL)/$(TARGET)
+		CC_REL       = gcc -O3 $(TESTINCS) $(CLINE)
+		CPP_REL      = g++ -O3 $(TESTINCS) $(CPPLINE)
+		GENLIBS_DBG := $(GENDEPS_DBG)
+		LINK1_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,-rpath,\$$ORIGIN:$(OUTDIR_DBG) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
 		LINK3_DBG   := 
 		CC_DBG       = gcc -g $(TESTINCS) $(CLINE)
 		CPP_DBG      = g++ -g $(TESTINCS) $(CPPLINE)
@@ -164,7 +236,7 @@ else ifeq ($(PLATFORM),win32)
 		CPP_DBG      = $(CC_DBG)
 	else ifeq ($(TYPE),exe)
 		ifeq ($(LOCALNAME),tests)
-			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2> /dev/null) -I$(ROOT)/libs/libutpp
+			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2>/dev/null) -I$(ROOT)/libs/libutpp
 			ifneq ($(notdir $(realpath ..)),libutpp)
 				PRE_BUILD    := $(ROOT)/libs/libutpp/$(PLATFORM) $(PRE_BUILD)
 			endif
