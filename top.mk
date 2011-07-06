@@ -145,27 +145,27 @@ else ifeq ($(PLATFORM),darwin)
 		TARGET      := $(LOCALNAME).a
 		GENLIBS_REL := (echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%); $(GENDEPS_REL))
 		LINK1_REL   := ar cr $(OUTDIR_REL)/$(TARGET) $(OBJS_REL)
-		LINK2_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
+		LINK2_REL   := for i in $(DLLS_REL); do cp $$i $(OUTDIR_REL); done
 		LINK3_REL   := 
 		CC_REL       = gcc -fPIC -O3 $(CLINE)
 		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
 		GENLIBS_DBG := (echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%); $(GENDEPS_DBG))
 		LINK1_DBG   := ar cr $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG)
-		LINK2_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		LINK2_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
 		LINK3_DBG   := 
 		CC_DBG       = gcc -fPIC -g $(CLINE)
 		CPP_DBG      = g++ -fPIC -g $(CPPLINE)
 	else ifeq ($(TYPE),dll)
 		TARGET      := $(LOCALNAME).dylib
 		GENLIBS_REL := echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%)
-		LINK1_REL   := gcc -dynamiclib -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
-		LINK2_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
+		LINK1_REL   := gcc -dynamiclib -Wl,-install_name,@executable_path/$(TARGET) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
+		LINK2_REL   := for i in $(DLLS_REL); do cp $$i $(OUTDIR_REL); done
 		LINK3_REL   := 
 		CC_REL       = gcc -fPIC -O3 $(CLINE)
 		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
 		GENLIBS_DBG := echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%)
-		LINK1_DBG   := gcc -dynamiclib -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
-		LINK2_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
+		LINK1_DBG   := gcc -dynamiclib -Wl,-install_name,@executable_path/$(TARGET) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
+		LINK2_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
 		LINK3_DBG   := 
 		CC_DBG       = gcc -fPIC -g $(CLINE)
 		CPP_DBG      = g++ -fPIC -g $(CPPLINE)
@@ -188,14 +188,14 @@ else ifeq ($(PLATFORM),darwin)
 		endif
 		TARGET      := $(LOCALNAME)
 		GENLIBS_REL := $(GENDEPS_REL)
-		LINK1_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
-		LINK2_REL   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,-rpath,\$$ORIGIN:$(OUTDIR_REL) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
+		LINK1_REL   := for i in $(DLLS_REL); do cp $$i $(OUTDIR_REL); done
+		LINK2_REL   := $(if $(strip $(CPP_SRCS)),g++,gcc) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
 		LINK3_REL   := strip $(OUTDIR_REL)/$(TARGET)
 		CC_REL       = gcc -O3 $(TESTINCS) $(CLINE)
 		CPP_REL      = g++ -O3 $(TESTINCS) $(CPPLINE)
 		GENLIBS_DBG := $(GENDEPS_DBG)
-		LINK1_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
-		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,-rpath,\$$ORIGIN:$(OUTDIR_DBG) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
+		LINK1_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
+		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
 		LINK3_DBG   := 
 		CC_DBG       = gcc -g $(TESTINCS) $(CLINE)
 		CPP_DBG      = g++ -g $(TESTINCS) $(CPPLINE)
