@@ -22,6 +22,7 @@
 #define CMD_JTAG_CLOCK_DATA   0x81
 #define CMD_JTAG_CLOCK_FSM    0x82
 #define CMD_JTAG_CLOCK        0x83
+#define CMD_CALCULATOR        0x84
 #define CMD_READ_WRITE_EEPROM 0xA2
 
 // Bits in the mode word
