@@ -27,7 +27,14 @@ else
 	ifeq ($(PLATFORM),darwin)
 		DLL  := dylib
 	else
-		ARCHFLAGS := -m32
+		MACHINE := $(shell uname -m)
+		ifeq ($(MACHINE),x86_64)
+			ARCHFLAGS := -m64
+			PLATFORM := $(PLATFORM).x86_64
+		else ifeq ($(MACHINE),i686)
+			ARCHFLAGS := -m32
+			PLATFORM := $(PLATFORM).i686
+		endif
 		DLL  := so
 	endif
 endif
@@ -65,7 +72,7 @@ GENDEPS_DBG   := for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PLATFORM)/dbg/libs.txt); 
 DLLS_DBG      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDIR_DBG)/*.$(DLL)))
 
 # Platform-specific stuff:
-ifeq ($(PLATFORM),linux)
+ifneq (,$(findstring linux,$(PLATFORM)))
 	ifeq ($(strip $(CFLAGS)),)
 		CFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS) -I.
 	endif
