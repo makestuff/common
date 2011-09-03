@@ -27,6 +27,7 @@ else
 	ifeq ($(PLATFORM),darwin)
 		DLL  := dylib
 	else
+		ARCHFLAGS := -m32
 		DLL  := so
 	endif
 endif
@@ -66,11 +67,11 @@ DLLS_DBG      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDI
 # Platform-specific stuff:
 ifeq ($(PLATFORM),linux)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS) -I.
+		CFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS) -I.
 	endif
 	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS) -I.
+		CPPFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS) -I.
 	endif
 	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(TYPE),lib)
@@ -90,13 +91,13 @@ ifeq ($(PLATFORM),linux)
 	else ifeq ($(TYPE),dll)
 		TARGET      := $(LOCALNAME).so
 		GENLIBS_REL := echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%)
-		LINK1_REL   := gcc -shared -Wl,-soname,$(TARGET) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
+		LINK1_REL   := gcc -shared $(ARCHFLAGS) -Wl,-soname,$(TARGET) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
 		LINK2_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
 		LINK3_REL   := 
 		CC_REL       = gcc -fPIC -O3 $(CLINE)
 		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
 		GENLIBS_DBG := echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%)
-		LINK1_DBG   := gcc -shared -Wl,-soname,$(TARGET) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
+		LINK1_DBG   := gcc -shared $(ARCHFLAGS) -Wl,-soname,$(TARGET) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
 		LINK2_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
 		LINK3_DBG   := 
 		CC_DBG       = gcc -fPIC -g $(CLINE)
@@ -121,36 +122,36 @@ ifeq ($(PLATFORM),linux)
 		TARGET      := $(LOCALNAME)
 		GENLIBS_REL := $(GENDEPS_REL)
 		LINK1_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
-		LINK2_REL   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,--relax,--gc-sections,-Map=$(OBJDIR_REL)/$(TARGET).map,--cref,-rpath,\$$ORIGIN,-rpath-link,$(OUTDIR_REL) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
+		LINK2_REL   := $(if $(strip $(CPP_SRCS)),g++,gcc) $(ARCHFLAGS) -Wl,--relax,--gc-sections,-Map=$(OBJDIR_REL)/$(TARGET).map,--cref,-rpath,\$$ORIGIN,-rpath-link,$(OUTDIR_REL) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
 		LINK3_REL   := strip $(OUTDIR_REL)/$(TARGET)
 		CC_REL       = gcc -O3 $(TESTINCS) $(CLINE)
 		CPP_REL      = g++ -O3 $(TESTINCS) $(CPPLINE)
 		GENLIBS_DBG := $(GENDEPS_DBG)
 		LINK1_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
-		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,--relax,--gc-sections,-Map=$(OBJDIR_DBG)/$(TARGET).map,--cref,-rpath,\$$ORIGIN,-rpath-link,$(OUTDIR_DBG) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
+		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) $(ARCHFLAGS) -Wl,--relax,--gc-sections,-Map=$(OBJDIR_DBG)/$(TARGET).map,--cref,-rpath,\$$ORIGIN,-rpath-link,$(OUTDIR_DBG) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
 		LINK3_DBG   := 
 		CC_DBG       = gcc -g $(TESTINCS) $(CLINE)
 		CPP_DBG      = g++ -g $(TESTINCS) $(CPPLINE)
 	endif
 else ifeq ($(PLATFORM),darwin)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS) -I.
+		CFLAGS := -c -arch i386 -arch x86_64 -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS) -I.
 	endif
-	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d $< -o $@
+	CLINE = $(CFLAGS) $(INCLUDES) -o $@ $<
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS) -I.
+		CPPFLAGS := -c -arch i386 -arch x86_64 -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS) -I.
 	endif
-	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d $< -o $@
+	CPPLINE = $(CPPFLAGS) $(INCLUDES) -o $@ $<
 	ifeq ($(TYPE),lib)
 		TARGET      := $(LOCALNAME).a
 		GENLIBS_REL := (echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%); $(GENDEPS_REL))
-		LINK1_REL   := ar cr $(OUTDIR_REL)/$(TARGET) $(OBJS_REL)
+		LINK1_REL   := libtool -static -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL)
 		LINK2_REL   := for i in $(DLLS_REL); do cp $$i $(OUTDIR_REL); done
 		LINK3_REL   := 
 		CC_REL       = gcc -fPIC -O3 $(CLINE)
 		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
 		GENLIBS_DBG := (echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%); $(GENDEPS_DBG))
-		LINK1_DBG   := ar cr $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG)
+		LINK1_DBG   := libtool -static -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG)
 		LINK2_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
 		LINK3_DBG   := 
 		CC_DBG       = gcc -fPIC -gstabs+ $(CLINE)
@@ -158,13 +159,13 @@ else ifeq ($(PLATFORM),darwin)
 	else ifeq ($(TYPE),dll)
 		TARGET      := $(LOCALNAME).dylib
 		GENLIBS_REL := echo -L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%)
-		LINK1_REL   := gcc -dynamiclib -Wl,-install_name,@rpath/$(TARGET) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
+		LINK1_REL   := gcc -dynamiclib -arch i386 -arch x86_64 -Wl,-install_name,@rpath/$(TARGET) -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
 		LINK2_REL   := for i in $(DLLS_REL); do cp $$i $(OUTDIR_REL); done
 		LINK3_REL   := 
 		CC_REL       = gcc -fPIC -O3 $(CLINE)
 		CPP_REL      = g++ -fPIC -O3 $(CPPLINE)
 		GENLIBS_DBG := echo -L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%)
-		LINK1_DBG   := gcc -dynamiclib -Wl,-install_name,@rpath/$(TARGET) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
+		LINK1_DBG   := gcc -dynamiclib -arch i386 -arch x86_64 -Wl,-install_name,@rpath/$(TARGET) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
 		LINK2_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
 		LINK3_DBG   := 
 		CC_DBG       = gcc -fPIC -gstabs+ $(CLINE)
@@ -189,13 +190,13 @@ else ifeq ($(PLATFORM),darwin)
 		TARGET      := $(LOCALNAME)
 		GENLIBS_REL := $(GENDEPS_REL)
 		LINK1_REL   := for i in $(DLLS_REL); do cp $$i $(OUTDIR_REL); done
-		LINK2_REL   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,-rpath,@loader_path/ -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
+		LINK2_REL   := $(if $(strip $(CPP_SRCS)),g++,gcc) -arch i386 -arch x86_64 -Wl,-rpath,@loader_path/ -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(TESTOBJS_REL) $(shell $(GENDEPS_REL)) $(LINK_EXTRALIBS_REL)
 		LINK3_REL   := strip $(OUTDIR_REL)/$(TARGET)
 		CC_REL       = gcc -O3 $(TESTINCS) $(CLINE)
 		CPP_REL      = g++ -O3 $(TESTINCS) $(CPPLINE)
 		GENLIBS_DBG := $(GENDEPS_DBG)
 		LINK1_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
-		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) -Wl,-rpath,@loader_path/ -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
+		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) -arch i386 -arch x86_64 -Wl,-rpath,@loader_path/ -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(shell $(GENDEPS_DBG)) $(LINK_EXTRALIBS_DBG)
 		LINK3_DBG   := 
 		CC_DBG       = gcc -gstabs+ $(TESTINCS) $(CLINE)
 		CPP_DBG      = g++ -gstabs+ $(TESTINCS) $(CPPLINE)
