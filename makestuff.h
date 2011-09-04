@@ -44,14 +44,23 @@
 
 typedef unsigned char      uint8;
 typedef unsigned short     uint16;
-typedef unsigned long      uint32;
 #ifndef __cplusplus
 	typedef unsigned long long uint64;
 #endif
 
 typedef signed char        int8;
 typedef signed short       int16;
-typedef signed long        int32;
+
+#if (defined __AVR__ && defined __GNUC__) || defined SDCC
+	// The embedded platforms have sizeof(int) = 2, so use long
+	typedef signed long    int32;
+	typedef unsigned long  uint32;
+#else
+	// The i686 & x86_64 have sizeof(int) = 4
+	typedef signed int     int32;
+	typedef unsigned int   uint32;
+#endif
+
 #ifndef __cplusplus
 	typedef signed long long   int64;
 #endif
