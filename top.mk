@@ -52,7 +52,7 @@ endif
 GENINCS   := echo -I$(CWD) $(EXTRA_INCS)
 DEPDIRS   := $(DEPS:%=$(ROOT)/libs/lib%)
 ifeq ($(strip $(CONFIGS)),)
-	CONFIGS = rel dbg
+	CONFIGS = dbg rel
 endif
 
 # Release config defines:
@@ -110,15 +110,15 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 		CC_DBG       = gcc -fPIC -g $(CLINE)
 		CPP_DBG      = g++ -fPIC -g $(CPPLINE)
 	else ifeq ($(TYPE),exe)
-		ifeq ($(LOCALNAME),tests)
+		ifneq (,$(findstring tests,$(LOCALNAME)))
 			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2>/dev/null) -I$(ROOT)/libs/libutpp
 			ifneq ($(notdir $(realpath ..)),libutpp)
 				PRE_BUILD    := $(ROOT)/libs/libutpp/$(PLATFORM) $(PRE_BUILD)
 			endif
 			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_REL) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.a
-			TESTEXE_REL  := $(OUTDIR_REL)/tests
+			TESTEXE_REL  := $(OUTDIR_REL)/$(LOCALNAME)
 			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_DBG) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.a
-			TESTEXE_DBG  := $(OUTDIR_DBG)/tests
+			TESTEXE_DBG  := $(OUTDIR_DBG)/$(LOCALNAME)
 		else
 			TESTINCS     :=
 			TESTOBJS_REL :=
@@ -178,15 +178,15 @@ else ifeq ($(PLATFORM),darwin)
 		CC_DBG       = gcc -fPIC -gstabs+ $(CLINE)
 		CPP_DBG      = g++ -fPIC -gstabs+ $(CPPLINE)
 	else ifeq ($(TYPE),exe)
-		ifeq ($(LOCALNAME),tests)
+		ifneq (,$(findstring tests,$(LOCALNAME)))
 			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2>/dev/null) -I$(ROOT)/libs/libutpp
 			ifneq ($(notdir $(realpath ..)),libutpp)
 				PRE_BUILD    := $(ROOT)/libs/libutpp/$(PLATFORM) $(PRE_BUILD)
 			endif
 			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_REL) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.a
-			TESTEXE_REL  := $(OUTDIR_REL)/tests
+			TESTEXE_REL  := $(OUTDIR_REL)/$(LOCALNAME)
 			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_DBG) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.a
-			TESTEXE_DBG  := $(OUTDIR_DBG)/tests
+			TESTEXE_DBG  := $(OUTDIR_DBG)/$(LOCALNAME)
 		else
 			TESTINCS     :=
 			TESTOBJS_REL :=
@@ -243,15 +243,15 @@ else ifeq ($(PLATFORM),win32)
 		CC_DBG       = cl -Od $(CLINE) -D_DEBUG -D_WINDOWS -D_USRDLL -D$(LOCALNAMEUPPER)_EXPORTS -D_WINDLL -Gm -RTC1 -MDd -ZI -Fo$@ -Fd$(OUTDIR_DBG)/$(LOCALNAME).pdb $<
 		CPP_DBG      = $(CC_DBG)
 	else ifeq ($(TYPE),exe)
-		ifeq ($(LOCALNAME),tests)
+		ifneq (,$(findstring tests,$(LOCALNAME)))
 			TESTINCS     := $(shell cat ../$(PLATFORM)/incs.txt 2>/dev/null) -I$(ROOT)/libs/libutpp
 			ifneq ($(notdir $(realpath ..)),libutpp)
 				PRE_BUILD    := $(ROOT)/libs/libutpp/$(PLATFORM) $(PRE_BUILD)
 			endif
 			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(wildcard ../$(OBJDIR_REL)/*.$(OBJ))) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.lib
-			TESTEXE_REL  := $(OUTDIR_REL)/tests
+			TESTEXE_REL  := $(OUTDIR_REL)/$(LOCALNAME)
 			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(wildcard ../$(OBJDIR_DBG)/*.$(OBJ))) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.lib
-			TESTEXE_DBG  := $(OUTDIR_DBG)/tests
+			TESTEXE_DBG  := $(OUTDIR_DBG)/$(LOCALNAME)
 		else
 			TESTINCS     :=
 			TESTOBJS_REL :=
