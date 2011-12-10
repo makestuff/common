@@ -70,8 +70,8 @@ typedef unsigned int       bitfield;
 #if defined __GNUC__
 	#define swap32(x) __builtin_bswap32(x)
 #elif defined WIN32
-	extern uint32 _byteswap_ulong(uint32);
 	#define swap32(x) _byteswap_ulong(x)
+#define inline __inline
 #endif
 #define swap16(x) ((((x) & 0x00FF) << 8) | (((x) >> 8) & 0x00FF))
 

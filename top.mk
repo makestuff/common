@@ -148,11 +148,11 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	endif
 else ifeq ($(PLATFORM),darwin)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c -arch i386 -arch x86_64 -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS) -I.
+		CFLAGS := -c -arch i386 -arch x86_64 -DBYTE_ORDER=1234 -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS) -I.
 	endif
 	CLINE = $(CFLAGS) $(INCLUDES) -o $@ $<
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c -arch i386 -arch x86_64 -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS) -I.
+		CPPFLAGS := -c -arch i386 -arch x86_64 -DBYTE_ORDER=1234 -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS) -I.
 	endif
 	CPPLINE = $(CPPFLAGS) $(INCLUDES) -o $@ $<
 	ifeq ($(TYPE),lib)
@@ -216,7 +216,7 @@ else ifeq ($(PLATFORM),darwin)
 	endif
 else ifeq ($(PLATFORM),win32)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -DWIN32 -D_CRT_SECURE_NO_WARNINGS -EHsc -W4 -nologo -c -errorReport:prompt  $(EXTRA_CFLAGS) -I.
+		CFLAGS := -DBYTE_ORDER=1234 -DWIN32 -D_CRT_SECURE_NO_WARNINGS -EHsc -W4 -nologo -c -errorReport:prompt  $(EXTRA_CFLAGS) -I.
 	endif
 	CLINE := $(CFLAGS) $(INCLUDES)
 	ifeq ($(TYPE),lib)
