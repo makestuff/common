@@ -29,11 +29,17 @@ else
 	else
 		MACHINE := $(shell uname -m)
 		ifeq ($(MACHINE),x86_64)
-			ARCHFLAGS := -m64
+			ARCHFLAGS := -m64 -DBYTE_ORDER=1234
 			PLATFORM := $(PLATFORM).x86_64
 		else ifeq ($(MACHINE),i686)
-			ARCHFLAGS := -m32
+			ARCHFLAGS := -m32 -DBYTE_ORDER=1234
 			PLATFORM := $(PLATFORM).i686
+		else ifeq ($(MACHINE),armel)
+			ARCHFLAGS := -DBYTE_ORDER=1234
+			PLATFORM := $(PLATFORM).armel
+		else ifeq ($(MACHINE),ppc)
+			ARCHFLAGS := -DBYTE_ORDER=4321
+			PLATFORM := $(PLATFORM).ppc
 		endif
 		DLL  := so
 	endif
