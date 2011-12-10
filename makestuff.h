@@ -67,4 +67,46 @@ typedef signed short       int16;
 
 typedef unsigned int       bitfield;
 
+#if defined __GNUC__
+	#define swap32(x) __builtin_bswap32(x)
+#elif defined WIN32
+	extern uint32 _byteswap_ulong(uint32);
+	#define swap32(x) _byteswap_ulong(x)
+#endif
+#define swap16(x) ((((x) & 0x00FF) << 8) | (((x) >> 8) & 0x00FF))
+
+#ifdef BYTE_ORDER
+	#if BYTE_ORDER == 1234
+		// Little-endian machines
+		static inline uint16 bigEndian16(uint16 x) {
+			return swap16(x);
+		}
+		static inline uint32 bigEndian32(uint32 x) {
+			return swap32(x);
+		}
+		static inline uint16 littleEndian16(uint16 x) {
+			return x;
+		}
+		static inline uint32 littleEndian32(uint32 x) {
+			return x;
+		}
+	#elif BYTE_ORDER == 4321
+		// Big-endian machines
+		static inline uint16 bigEndian16(uint16 x) {
+			return x;
+		}
+		static inline uint32 bigEndian32(uint32 x) {
+			return x;
+		}
+		static inline uint16 littleEndian16(uint16 x) {
+			return swap16(x);
+		}
+		static inline uint32 littleEndian32(uint32 x) {
+			return swap32(x);
+		}
+	#else
+		#error Unsupported BYTE_ORDER
+	#endif
+#endif
+
 #endif
