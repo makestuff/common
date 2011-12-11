@@ -30,16 +30,16 @@ else
 		MACHINE := $(shell uname -m)
 		ifeq ($(MACHINE),x86_64)
 			ARCHFLAGS := -m64 -DBYTE_ORDER=1234
-			PLATFORM := $(PLATFORM).x86_64
+			PLATFORM := $(PLATFORM).$(MACHINE)
 		else ifeq ($(MACHINE),i686)
 			ARCHFLAGS := -m32 -DBYTE_ORDER=1234
-			PLATFORM := $(PLATFORM).i686
-		else ifeq ($(MACHINE),armel)
+			PLATFORM := $(PLATFORM).$(MACHINE)
+		else ifneq (,$(findstring armv,$(MACHINE)))
 			ARCHFLAGS := -DBYTE_ORDER=1234
 			PLATFORM := $(PLATFORM).armel
 		else ifeq ($(MACHINE),ppc)
 			ARCHFLAGS := -DBYTE_ORDER=4321
-			PLATFORM := $(PLATFORM).ppc
+			PLATFORM := $(PLATFORM).$(MACHINE)
 		endif
 		DLL  := so
 	endif
