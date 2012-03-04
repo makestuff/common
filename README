@@ -1,13 +1,1 @@
 Top-level includes, stuff that almost everything else needs.
-
-The project build assumes a directory structure like this:
-
-src
-|
-+-common
-|
-+-apps
-|
-+-libs
-|
-+-3rd
