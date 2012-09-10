@@ -73,6 +73,16 @@ makestuff.sh script on a GNU-like machine:
 To use, you should unpack the "makestuff" directory to C:/ and make a desktop shortcut to
 C:\makestuff\msys\bin\sh.exe --login. The resulting command prompt assumes you have Microsoft Visual
 Studio Express 2010 installed. If you want to use VS2008, edit etc/profile.
+
+To install vim:
+
+mkdir vim
+cd vim
+wget -q 'http://prdownloads.sourceforge.net/mingw/vim-7.3-2-msys-1.0.16-bin.tar.lzma?download'
+7za.exe x -so vim-7.3-2-msys-1.0.16-bin.tar.lzma | tar xf -
+mv bin/vim.exe /bin/
+cd ..
+rm -rf vim
 EOF
 cp unpack/7za.exe ../msys/bin/
 cp unpack/bin/bunzip2.exe ../msys/bin/
