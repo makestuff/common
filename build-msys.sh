@@ -38,9 +38,11 @@ wget 'http://prdownloads.sourceforge.net/mingw/libregex-1.20090805-2-msys-1.0.13
 wget 'http://prdownloads.sourceforge.net/mingw/libtermcap-0.20050421_1-2-msys-1.0.13-dll-0.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/libopenssl-1.0.0-1-msys-1.0.13-dll-100.tar.lzma?download'
 wget 'http://prdownloads.sourceforge.net/mingw/sed-4.2.1-2-msys-1.0.13-bin.tar.lzma?download'
+wget -O 7za920.zip 'http://prdownloads.sourceforge.net/sevenzip/7-Zip/9.20/7za920.zip?download'
 rm -rf unpack ../msys
 mkdir -p unpack
 cd unpack/
+unzip ../7za920.zip
 for i in ../*.tar.lzma*; do tar --lzma -xf $i; done
 cd ..
 mkdir -p ../msys
@@ -72,6 +74,7 @@ To use, you should unpack the "makestuff" directory to C:/ and make a desktop sh
 C:\makestuff\msys\bin\sh.exe --login. The resulting command prompt assumes you have Microsoft Visual
 Studio Express 2010 installed. If you want to use VS2008, edit etc/profile.
 EOF
+cp unpack/7za.exe ../msys/bin/
 cp unpack/bin/bunzip2.exe ../msys/bin/
 cp unpack/bin/bzip2.exe ../msys/bin/
 cp unpack/bin/cat.exe ../msys/bin/

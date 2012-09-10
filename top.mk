@@ -349,6 +349,12 @@ $(ROOT)/3rd/fx2lib:
 	rm fx2lib.tgz
 	mv mulicheng-fx2lib-* $(ROOT)/3rd/fx2lib
 
+$(ROOT)/3rd/libusbx-%-win:
+	wget -O libusbx-1.0.7z --no-check-certificate 'http://sourceforge.net/projects/libusbx/files/releases/$(patsubst libusbx-%-win,%,$(@F))/Windows/$(@F).7z/download'
+	mkdir -p $@
+	7za x -o $@ libusbx-1.0.7z
+	rm -f libusbx-1.0.7z
+
 $(ROOT)/3rd/libusb-win32-bin-%:
 	wget -O libusb-win32.zip --no-check-certificate 'http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/$(patsubst libusb-win32-bin-%,%,$(@F))/$(@F).zip/download'
 	unzip libusb-win32.zip
