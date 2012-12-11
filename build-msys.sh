@@ -53,13 +53,49 @@ cat > ../msys/etc/profile <<EOF
 # For Visual Studio Express 2010:
 export MSVC=10.0
 export MSWSDK=v7.0A
+#export MSWSDK=v7.1
 # For Visual Studio Express 2008:
 #export MSVC=9.0
 #export MSWSDK=v6.0A
 
-export INCLUDE="C:/Program Files/Microsoft Visual Studio \$MSVC/VC/INCLUDE;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/include"
-export LIB="C:/Program Files/Microsoft Visual Studio \$MSVC/VC/LIB;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/lib"
-export PATH="/bin:/c/Program Files/Microsoft Visual Studio \$MSVC/Common7/IDE:/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK/bin:/c/Program Files/Microsoft Visual Studio \$MSVC/VC/bin:.:\$PATH"
+export PATH="/bin:.:\$PATH"
+if [ ! -e "/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK" ]; then
+  if [ ! -e "/c/Program Files/Microsoft SDKs/Windows" ]; then
+    echo "You don't seem to have any Microsoft SDKs installed!"
+  else
+    echo "Cannot find Windows SDK version \$MSWSDK."
+    echo "Are you sure MSWSDK is set correctly in /etc/profile?"
+    echo "These are the Windows SDKs you appear to have installed:"
+    ls "/c/Program Files/Microsoft SDKs/Windows"
+  fi
+fi
+if [ \${PROCESSOR_ARCHITEW6432:-null} = null ]; then
+  # We're not in WOW64 so this is probably an x86 system
+  if [ ! -e "/c/Program Files/Microsoft Visual Studio \$MSVC" ]; then
+    echo "Cannot find Visual Studio version \$MSVC."
+    echo "Have you set MSVC correctly in /etc/profile?"
+	 echo "These are the Visual Studio versions you appear to have installed:"
+    ls "/c/Program Files" | grep "Microsoft Visual Studio"
+  fi
+  export INCLUDE="C:/Program Files/Microsoft Visual Studio \$MSVC/VC/INCLUDE;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/include"
+  export LIB="C:/Program Files/Microsoft Visual Studio \$MSVC/VC/LIB;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/lib"
+  export PATH="/c/Program Files/Microsoft Visual Studio \$MSVC/VC/bin:\$PATH"
+  export PATH="/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK/bin:\$PATH"
+  export PATH="/c/Program Files/Microsoft Visual Studio \$MSVC/Common7/IDE:\$PATH"
+else
+  # We're in WOW64 so this is probably an x86_64 system
+  if [ ! -e "/c/Program Files (x86)/Microsoft Visual Studio \$MSVC" ]; then
+    echo "Cannot find Visual Studio version \$MSVC."
+    echo "Have you set MSVC correctly in /etc/profile?"
+	 echo "These are the Visual Studio versions you appear to have installed:"
+    ls "/c/Program Files (x86)" | grep "Microsoft Visual Studio"
+  fi
+  export INCLUDE="C:/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/INCLUDE;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/include"
+  export LIB="C:/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/LIB;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/lib"
+  export PATH="/c/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/bin:\$PATH"
+  export PATH="/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK/bin:\$PATH"
+  export PATH="/c/Program Files (x86)/Microsoft Visual Studio \$MSVC/Common7/IDE:\$PATH"
+fi
 export PS1="\${USERNAME}@\${HOSTNAME}\$ "
 EOF
 cat > ../msys/README <<EOF

@@ -16,7 +16,11 @@
 #
 # Determine platform:
 ifeq ($(OS),Windows_NT)
-	PLATFORM := mswin.x86
+	ifdef PROCESSOR_ARCHITEW6432
+		PLATFORM := mswin.x86_64
+	else
+		PLATFORM := mswin.x86
+	endif
 	OBJ      := obj
 	DLL      := dll
 	EXE      := .exe
