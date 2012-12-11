@@ -16,7 +16,7 @@
 #
 # Determine platform:
 ifeq ($(OS),Windows_NT)
-	PLATFORM := win32
+	PLATFORM := mswin.x86
 	OBJ      := obj
 	DLL      := dll
 	EXE      := .exe
@@ -214,7 +214,7 @@ else ifeq ($(PLATFORM),darwin)
 		CC_DBG       = gcc -gstabs+ $(TESTINCS) $(CLINE)
 		CPP_DBG      = g++ -gstabs+ $(TESTINCS) $(CPPLINE)
 	endif
-else ifeq ($(PLATFORM),win32)
+else ifneq (,$(findstring mswin,$(PLATFORM)))
 	ifeq ($(strip $(CFLAGS)),)
 		CFLAGS := -DBYTE_ORDER=1234 -DWIN32 -D_CRT_SECURE_NO_WARNINGS -EHsc -W4 -nologo -c -errorReport:prompt  $(EXTRA_CFLAGS) -I.
 	endif
