@@ -31,7 +31,7 @@ else
 		ifeq ($(MACHINE),x86_64)
 			ARCHFLAGS := -m64 -DBYTE_ORDER=1234
 			PLATFORM := $(PLATFORM).$(MACHINE)
-		else ifeq ($(MACHINE),i686)
+		else ifeq ($(MACHINE),x86)
 			ARCHFLAGS := -m32 -DBYTE_ORDER=1234
 			PLATFORM := $(PLATFORM).$(MACHINE)
 		else ifneq (,$(findstring armv,$(MACHINE)))
