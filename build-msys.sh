@@ -91,8 +91,8 @@ else
     ls "/c/Program Files (x86)" | grep "Microsoft Visual Studio"
   fi
   export INCLUDE="C:/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/INCLUDE;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/include"
-  export LIB="C:/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/LIB;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/lib"
-  export PATH="/c/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/bin:\$PATH"
+  export LIB="C:/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/LIB/amd64;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/lib/x64"
+  export PATH="/c/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/bin/amd64:\$PATH"
   export PATH="/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK/bin:\$PATH"
   export PATH="/c/Program Files (x86)/Microsoft Visual Studio \$MSVC/Common7/IDE:\$PATH"
 fi
