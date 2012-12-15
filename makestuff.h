@@ -18,6 +18,8 @@
 #ifndef MAKESTUFF_H
 #define MAKESTUFF_H
 
+#include <stddef.h>
+
 #ifndef __cplusplus
 	#ifdef WIN32
 		typedef char bool;
@@ -33,9 +35,21 @@
 #ifdef WIN32
 	#define WARN_UNUSED_RESULT
 	#define DLLEXPORT(t) __declspec(dllexport) t __stdcall
+	#define PFSZD "%Iu"
+	#ifdef _WIN64
+		#define PFSZH "%016IX"
+	#else
+		#define PFSZH "%08IX"
+	#endif
 #else
 	#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 	#define DLLEXPORT(t) t
+	#define PFSZD "%zu"
+	#ifdef __LP64__
+		#define PFSZH "%016zX"
+	#else
+		#define PFSZH "%08zX"
+	#endif
 #endif
 
 #ifndef NULL
