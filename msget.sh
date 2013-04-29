@@ -23,7 +23,7 @@ if [ -e ${1} ]; then
 	echo "$1 already exists"
 	exit 1
 fi
-wget --no-check-certificate -O ${1}.tgz https://api.github.com/repos/makestuff/${1}/tarball
+wget --no-check-certificate -O ${1}.tgz https://github.com/makestuff/${1}/archive/master.tar.gz
 tar zxf ${1}.tgz
-mv makestuff-${1}-* ${1}
+mv ${1}-master ${1}
 rm -f zxf ${1}.tgz
