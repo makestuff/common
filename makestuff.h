@@ -90,6 +90,10 @@ typedef unsigned int       bitfield;
 #endif
 #define swap16(x) ((((x) & 0x00FF) << 8) | (((x) >> 8) & 0x00FF))
 
+// The C standard requires this two-level indirection thing
+#define CONCAT_INTERNAL(x, y) x ## y
+#define CONCAT(x, y) CONCAT_INTERNAL(x, y)
+
 #ifdef BYTE_ORDER
 	#if BYTE_ORDER == 1234
 		// Little-endian machines
