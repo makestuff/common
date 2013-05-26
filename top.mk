@@ -42,11 +42,14 @@ else
 			PLATFORM := lin
 		endif
 		ifeq ($(MACHINE),x86_64)
-			ARCHFLAGS := -m64 -DBYTE_ORDER=1234
 			MACHINE := x64
 		else ifeq ($(MACHINE),i686)
-			ARCHFLAGS := -m32 -DBYTE_ORDER=1234
 			MACHINE := x86
+		endif
+		ifeq ($(MACHINE),x64)
+			ARCHFLAGS := -m64 -DBYTE_ORDER=1234
+		else ifeq ($(MACHINE),x86)
+			ARCHFLAGS := -m32 -DBYTE_ORDER=1234
 		else ifneq (,$(findstring armv,$(MACHINE)))
 			ABI := $(shell gcc -dumpmachine)
 			ifeq ($(ABI),arm-linux-gnueabihf)
