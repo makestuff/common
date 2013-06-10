@@ -59,43 +59,87 @@ export MSWSDK=v7.0A
 #export MSWSDK=v6.0A
 
 export PATH="/bin:.:\$PATH"
-if [ ! -e "/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK" ]; then
-  if [ ! -e "/c/Program Files/Microsoft SDKs/Windows" ]; then
-    echo "You don't seem to have any Microsoft SDKs installed!"
-  else
-    echo "Cannot find Windows SDK version \$MSWSDK."
+
+if [ -e "/c/Program Files/Microsoft SDKs/Windows/\${MSWSDK}" ]; then
+  export SDK_HOME="Program Files/Microsoft SDKs/Windows/\${MSWSDK}"
+elif [ -e "/c/Program Files (x86)/Microsoft SDKs/Windows/\${MSWSDK}" ]; then
+  export SDK_HOME="Program Files (x86)/Microsoft SDKs/Windows/\${MSWSDK}"
+else
+    echo "Cannot find Windows SDK version \${MSWSDK}."
     echo "Are you sure MSWSDK is set correctly in /etc/profile?"
     echo "These are the Windows SDKs you appear to have installed:"
-    ls "/c/Program Files/Microsoft SDKs/Windows"
-  fi
+    ls "/c/Program Files/Microsoft SDKs/Windows" 2> /dev/null
+    ls "/c/Program Files (x86)/Microsoft SDKs/Windows" 2> /dev/null
 fi
+
+if [ -e "/c/Program Files/Microsoft Visual Studio \${MSVC}" ]; then
+  export VS_HOME="Program Files/Microsoft Visual Studio \${MSVC}"
+elif [ -e "/c/Program Files (x86)/Microsoft Visual Studio \${MSVC}" ]; then
+  export VS_HOME="Program Files (x86)/Microsoft Visual Studio \${MSVC}"
+else
+  echo "Cannot find Visual Studio version \${MSVC}."
+  echo "Have you set MSVC correctly in /etc/profile?"
+  echo "These are the Visual Studio versions you appear to have installed:"
+  ls "/c/Program Files" | grep "Microsoft Visual Studio" 2> /dev/null
+  ls "/c/Program Files (x86)" | grep "Microsoft Visual Studio" 2> /dev/null
+fi
+
 if [ \${PROCESSOR_ARCHITEW6432:-null} = null ]; then
   # We're not in WOW64 so this is probably an x86 system
-  if [ ! -e "/c/Program Files/Microsoft Visual Studio \$MSVC" ]; then
-    echo "Cannot find Visual Studio version \$MSVC."
-    echo "Have you set MSVC correctly in /etc/profile?"
-	 echo "These are the Visual Studio versions you appear to have installed:"
-    ls "/c/Program Files" | grep "Microsoft Visual Studio"
-  fi
-  export INCLUDE="C:/Program Files/Microsoft Visual Studio \$MSVC/VC/INCLUDE;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/include"
-  export LIB="C:/Program Files/Microsoft Visual Studio \$MSVC/VC/LIB;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/lib"
-  export PATH="/c/Program Files/Microsoft Visual Studio \$MSVC/VC/bin:\$PATH"
-  export PATH="/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK/bin:\$PATH"
-  export PATH="/c/Program Files/Microsoft Visual Studio \$MSVC/Common7/IDE:\$PATH"
+  export LIB="C:/\${VS_HOME}/VC/LIB;C:/\${SDK_HOME}/lib"
+  export PATH="/c/\${VS_HOME}/VC/bin:\$PATH"
 else
   # We're in WOW64 so this is probably an x86_64 system
-  if [ ! -e "/c/Program Files (x86)/Microsoft Visual Studio \$MSVC" ]; then
-    echo "Cannot find Visual Studio version \$MSVC."
-    echo "Have you set MSVC correctly in /etc/profile?"
-	 echo "These are the Visual Studio versions you appear to have installed:"
-    ls "/c/Program Files (x86)" | grep "Microsoft Visual Studio"
-  fi
-  export INCLUDE="C:/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/INCLUDE;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/include"
-  export LIB="C:/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/LIB/amd64;C:/Program Files/Microsoft SDKs/Windows/\$MSWSDK/lib/x64"
-  export PATH="/c/Program Files (x86)/Microsoft Visual Studio \$MSVC/VC/bin/amd64:\$PATH"
-  export PATH="/c/Program Files/Microsoft SDKs/Windows/\$MSWSDK/bin:\$PATH"
-  export PATH="/c/Program Files (x86)/Microsoft Visual Studio \$MSVC/Common7/IDE:\$PATH"
+  export LIB="C:/\${VS_HOME}/VC/LIB/amd64;C:/\${SDK_HOME}/lib/x64"
+  export PATH="/c/\${VS_HOME}/VC/bin/amd64:\$PATH"
 fi
+export PATH="/c/\${SDK_HOME}/bin:\$PATH"
+export PATH="/c/\${VS_HOME}/Common7/IDE:\$PATH"
+export INCLUDE="C:/\${VS_HOME}/VC/INCLUDE;C:/\${SDK_HOME}/include"
+export PS1="\${USERNAME}@\${HOSTNAME}\$ "
+EOF
+cat > ../msys/etc/profile.win8 <<EOF
+# For Visual Studio Express 2012:
+export MSVC=11.0
+export MSWSDK=8.0
+
+export PATH="/bin:.:\$PATH"
+
+if [ -e "/c/Program Files/Windows Kits/\${MSWSDK}" ]; then
+  export SDK_HOME="Program Files/Windows Kits/\${MSWSDK}"
+elif [ -e "/c/Program Files (x86)/Windows Kits/\${MSWSDK}" ]; then
+  export SDK_HOME="Program Files (x86)/Windows Kits/\${MSWSDK}"
+else
+    echo "Cannot find Windows SDK version \${MSWSDK}."
+    echo "Are you sure MSWSDK is set correctly in /etc/profile?"
+    echo "These are the Windows SDKs you appear to have installed:"
+    ls "/c/Program Files/Windows Kits" 2> /dev/null
+    ls "/c/Program Files (x86)/Windows Kits" 2> /dev/null
+fi
+
+if [ -e "/c/Program Files/Microsoft Visual Studio \${MSVC}" ]; then
+  export VS_HOME="Program Files/Microsoft Visual Studio \${MSVC}"
+elif [ -e "/c/Program Files (x86)/Microsoft Visual Studio \${MSVC}" ]; then
+  export VS_HOME="Program Files (x86)/Microsoft Visual Studio \${MSVC}"
+else
+  echo "Cannot find Visual Studio version \${MSVC}."
+  echo "Have you set MSVC correctly in /etc/profile?"
+  echo "These are the Visual Studio versions you appear to have installed:"
+  ls "/c/Program Files" | grep "Microsoft Visual Studio" 2> /dev/null
+  ls "/c/Program Files (x86)" | grep "Microsoft Visual Studio" 2> /dev/null
+fi
+
+if [ \${PROCESSOR_ARCHITEW6432:-null} = null ]; then
+  # We're not in WOW64 so this is probably an x86 system
+  export LIB="C:/\${VS_HOME}/VC/LIB;C:/\${SDK_HOME}/lib/win8/um/x86"
+  export PATH="/c/\${VS_HOME}/VC/bin:/c/\${SDK_HOME}/bin/x86:\$PATH"
+else
+  # We're in WOW64 so this is probably an x86_64 system
+  export LIB="C:/\${VS_HOME}/VC/LIB/amd64;C:/\${SDK_HOME}/lib/win8/um/x64"
+  export PATH="/c/\${VS_HOME}/VC/bin/x86_amd64:/c/\${SDK_HOME}/bin/x64:\$PATH"
+fi
+export PATH="/c/\${VS_HOME}/Common7/IDE:\$PATH"
+export INCLUDE="C:/\${VS_HOME}/VC/INCLUDE;C:/\${SDK_HOME}/include/um;C:/\${SDK_HOME}/include/shared"
 export PS1="\${USERNAME}@\${HOSTNAME}\$ "
 EOF
 cat > ../msys/README <<EOF
