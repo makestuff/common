@@ -14,6 +14,12 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+
+# Determine branch:
+ifndef BRANCH
+	BRANCH := $(shell TRY=$(CURDIR); BRANCH=master; while [ "$${TRY}" != "$(ROOT)" -a "$${TRY}" != "/" ]; do if [ -e "$${TRY}/.branch" ]; then BRANCH=$$(cat "$${TRY}/.branch"); break; fi; TRY=$$(dirname $${TRY}); done; echo $${BRANCH})
+endif
+
 # Determine platform:
 ifeq ($(OS),Windows_NT)
 	ifdef PROCESSOR_ARCHITEW6432
@@ -306,7 +312,7 @@ endif
 
 # Config-agnostic rules:
 all: $(PRE_BUILD) $(CONFIGS) $(POST_BUILD)
-	@for i in $(SUBDIRS); do make -C $$i; done
+	@for i in $(SUBDIRS); do make -C $$i BRANCH=$(BRANCH); done
 
 $(PM)/incs.txt: $(PM)
 	$(GENINCS) > $@
@@ -319,7 +325,7 @@ FORCE:
 
 
 deps: $(DEPDIRS:%=%/$(PM))
-	make
+	make BRANCH=$(BRANCH)
 
 depclean: $(DEPDIRS) clean
 	@for i in $(DEPDIRS); do make -C $$i clean; done
@@ -385,13 +391,13 @@ $(ROOT)/3rd/libusb-win32-bin-%:
 	mv $(@F) $(ROOT)/3rd/
 
 $(ROOT)/libs/lib%/Makefile:
-	@echo Fetching $(notdir $(@D)) from GitHub...
-	wget -O $(notdir $(@D)).tgz --no-check-certificate https://github.com/makestuff/$(notdir $(@D))/tarball/master
+	@echo Fetching $(notdir $(@D))/$(BRANCH) from GitHub...
+	wget -qO $(notdir $(@D)).tgz --no-check-certificate https://github.com/makestuff/$(notdir $(@D))/tarball/$(BRANCH)
 	tar xvzf $(notdir $(@D)).tgz
 	rm $(notdir $(@D)).tgz
 	mv makestuff-$(notdir $(@D))-* $(ROOT)/libs/$(notdir $(@D))
 
 $(ROOT)/libs/lib%/$(PM): $(ROOT)/libs/lib%/Makefile
-	make -C $(dir $<) deps
+	make -C $(dir $<) BRANCH=$(BRANCH) deps
 
 .PRECIOUS: $(ROOT)/libs/lib%/Makefile
