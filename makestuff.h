@@ -88,11 +88,24 @@ typedef unsigned int       bitfield;
 	#define swap32(x) _byteswap_ulong(x)
 #define inline __inline
 #endif
-#define swap16(x) ((((x) & 0x00FF) << 8) | (((x) >> 8) & 0x00FF))
+#define swap16(x) ((uint16)((((x) & 0x00FF) << 8) | (((x) >> 8) & 0x00FF)))
 
 // The C standard requires this two-level indirection thing
 #define CONCAT_INTERNAL(x, y) x ## y
 #define CONCAT(x, y) CONCAT_INTERNAL(x, y)
+
+// The VA_NARGS() macro - count the number of arguments in a C99 variadic macro
+#define VA_EXPAND(x) x
+#define VA_NARGS(...) VA_EXPAND(VA_NARGS_INTERNAL(__VA_ARGS__, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1))
+#define VA_NARGS_INTERNAL(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, N, ...) N
+#define FAIL(code, label) { retVal = code; goto label; }
+
+// The CHECK_STATUS() macro - if condition is true, set a returnCode and jump to a label (exit,
+// cleanup etc). If liberror is included you can also give an error message.
+#define CHECK_INTERNAL3(condition, code, label) if ( condition ) { FAIL(code, label); }
+#define CHECK_INTERNAL4(condition, code, label, prefix) LIBERROR_IS_REQUIRED
+#define CHECK_INTERNAL5(condition, code, label, ...) LIBERROR_IS_REQUIRED
+#define CHECK_STATUS(...) CONCAT(CHECK_INTERNAL, VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
 
 #ifdef BYTE_ORDER
 	#if BYTE_ORDER == 1234

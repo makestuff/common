@@ -17,7 +17,7 @@
 
 # Determine branch:
 ifndef BRANCH
-	BRANCH := $(shell TRY=$(CURDIR); BRANCH=master; while [ "$${TRY}" != "$(ROOT)" -a "$${TRY}" != "/" ]; do if [ -e "$${TRY}/.branch" ]; then BRANCH=$$(cat "$${TRY}/.branch"); break; fi; TRY=$$(dirname $${TRY}); done; echo $${BRANCH})
+	BRANCH := $(shell TRY=$(CURDIR); BRANCH=dev; while [ "$${TRY}" != "$(ROOT)" -a "$${TRY}" != "/" ]; do if [ -e "$${TRY}/.branch" ]; then BRANCH=$$(cat "$${TRY}/.branch"); break; fi; TRY=$$(dirname $${TRY}); done; echo $${BRANCH})
 endif
 
 # Determine platform:
@@ -109,11 +109,11 @@ DLLS_DBG      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDI
 # Platform-specific stuff:
 ifeq ($(PLATFORM),lin)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds $(EXTRA_CFLAGS) -I.
+		CFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -Wconversion -Wenum-compare -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds $(EXTRA_CFLAGS) -I.
 	endif
 	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds -std=c++98 $(EXTRA_CPPFLAGS) -I.
+		CPPFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -Wno-variadic-macros -Wconversion -Wenum-compare -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds -std=c++98 $(EXTRA_CPPFLAGS) -I.
 	endif
 	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(TYPE),lib)
