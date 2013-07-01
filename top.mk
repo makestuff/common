@@ -248,7 +248,7 @@ else ifeq ($(PLATFORM),osx)
 	endif
 else ifeq ($(PLATFORM),win)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -DBYTE_ORDER=1234 -DWIN32 -D_CRT_SECURE_NO_WARNINGS -EHsc -W4 -nologo -c -errorReport:prompt  $(EXTRA_CFLAGS) -I.
+		CFLAGS := -DBYTE_ORDER=1234 -DWIN32 -D_CRT_SECURE_NO_WARNINGS -EHsc -W4 -wd4127 -nologo -c -errorReport:prompt  $(EXTRA_CFLAGS) -I.
 	endif
 	CLINE := $(CFLAGS) $(INCLUDES)
 	ifeq ($(TYPE),lib)
