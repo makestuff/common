@@ -105,7 +105,7 @@ typedef unsigned int       bitfield;
 #define CHECK_INTERNAL3(condition, code, label) if ( condition ) { FAIL(code, label); }
 #define CHECK_INTERNAL4(condition, code, label, prefix) LIBERROR_IS_REQUIRED
 #define CHECK_INTERNAL5(condition, code, label, ...) LIBERROR_IS_REQUIRED
-#define CHECK_STATUS(...) CONCAT(CHECK_INTERNAL, VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
+#define CHECK_STATUS(...) VA_EXPAND(CONCAT(CHECK_INTERNAL, VA_NARGS(__VA_ARGS__))(__VA_ARGS__))
 
 #ifdef BYTE_ORDER
 	#if BYTE_ORDER == 1234

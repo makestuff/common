@@ -22,12 +22,15 @@ endif
 
 # Determine platform:
 ifeq ($(OS),Windows_NT)
-	ifdef PROCESSOR_ARCHITEW6432
-		MACHINE := x64
+	MACHINE := $(shell echo $${MACHINE})
+	ifeq ($(MACHINE),x64)
 		ARCHFLAGS := -Zi
-	else
-		MACHINE := x86
+	else ifeq ($(MACHINE),x86)
 		ARCHFLAGS := -ZI -Gm
+	else ifndef MACHINE
+$(error MACHINE must be set to x86 or x64)
+	else
+$(error Invalid target architecture: MACHINE=$(MACHINE))
 	endif
 	PLATFORM := win
 	OBJ      := obj
