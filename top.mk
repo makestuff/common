@@ -382,7 +382,7 @@ $(ROOT)/3rd/fx2lib:
 	wget -qO fx2lib.tgz --no-check-certificate https://github.com/makestuff/fx2lib/archive/$(FX2LIB_VER).tar.gz
 	tar xvzf fx2lib.tgz
 	rm fx2lib.tgz
-	mv fx2lib-* $(ROOT)/3rd/fx2lib
+	mv fx2lib-$(FX2LIB_VER) $(ROOT)/3rd/fx2lib
 
 $(ROOT)/3rd/libusbx-%-win:
 	@echo Fetching libusbx Windows binary from SourceForge...
@@ -403,7 +403,7 @@ $(ROOT)/libs/lib%/Makefile:
 	wget -qO $(notdir $(@D)).tgz --no-check-certificate https://github.com/makestuff/$(notdir $(@D))/archive/$(BRANCH).tar.gz
 	tar xvzf $(notdir $(@D)).tgz
 	rm $(notdir $(@D)).tgz
-	mv makestuff-$(notdir $(@D))-* $(ROOT)/libs/$(notdir $(@D))
+	mv $(notdir $(@D))-$(BRANCH) $(ROOT)/libs/$(notdir $(@D))
 	echo $(BRANCH) > $(ROOT)/libs/$(notdir $(@D))/.branch
 
 $(ROOT)/libs/lib%/$(PM): $(ROOT)/libs/lib%/Makefile
