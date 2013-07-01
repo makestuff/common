@@ -404,6 +404,7 @@ $(ROOT)/libs/lib%/Makefile:
 	tar xvzf $(notdir $(@D)).tgz
 	rm $(notdir $(@D)).tgz
 	mv makestuff-$(notdir $(@D))-* $(ROOT)/libs/$(notdir $(@D))
+	echo $(BRANCH) > $(ROOT)/libs/$(notdir $(@D))/.branch
 
 $(ROOT)/libs/lib%/$(PM): $(ROOT)/libs/lib%/Makefile
 	make -C $(dir $<) BRANCH=$(BRANCH) deps
