@@ -286,9 +286,9 @@ else ifeq ($(PLATFORM),win)
 			ifneq ($(notdir $(realpath ..)),libutpp)
 				PRE_BUILD    := $(ROOT)/libs/libutpp/$(PM) $(PRE_BUILD)
 			endif
-			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(wildcard ../$(OBJDIR_REL)/*.$(OBJ))) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.lib
+			TESTOBJS_REL := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_REL) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_REL)/libutpp.lib
 			TESTEXE_REL  := $(OUTDIR_REL)/$(LOCALNAME)
-			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(wildcard ../$(OBJDIR_DBG)/*.$(OBJ))) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.lib
+			TESTOBJS_DBG := $(patsubst %/main.$(OBJ),,$(shell find ../$(OBJDIR_DBG) -name "*.$(OBJ)" 2>/dev/null)) $(ROOT)/libs/libutpp/$(OUTDIR_DBG)/libutpp.lib
 			TESTEXE_DBG  := $(OUTDIR_DBG)/$(LOCALNAME)
 		else
 			TESTINCS     :=
