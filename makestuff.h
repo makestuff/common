@@ -42,6 +42,7 @@
 		#define PFSZH "%08IX"
 	#endif
 #else
+	#define WINAPI
 	#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 	#define DLLEXPORT(t) t
 	#define PFSZD "%zu"
