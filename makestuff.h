@@ -95,6 +95,9 @@ typedef unsigned int       bitfield;
 #define CONCAT_INTERNAL(x, y) x ## y
 #define CONCAT(x, y) CONCAT_INTERNAL(x, y)
 
+#define STR_INTERNAL(x) #x
+#define STR(x) STR_INTERNAL(x)
+
 // The VA_NARGS() macro - count the number of arguments in a C99 variadic macro
 #define VA_EXPAND(x) x
 #define VA_NARGS(...) VA_EXPAND(VA_NARGS_INTERNAL(__VA_ARGS__, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1))
