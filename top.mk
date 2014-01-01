@@ -61,15 +61,17 @@ else
 			ARCHFLAGS := -m32 -DBYTE_ORDER=1234
 		else ifneq (,$(findstring armv,$(MACHINE)))
 			ABI := $(shell gcc -dumpmachine)
-			ifeq ($(ABI),arm-linux-gnueabihf)
+			ifneq (,$(findstring gnueabihf,$(ABI)))
 				MACHINE := armhf
-			else ifeq ($(ABI),arm-linux-gnueabi)
+			else ifneq (,$(findstring gnueabi,$(ABI)))
 				MACHINE := armel
 			else
 				$(error Unrecognised ABI: $(ABI))
 			endif
 			ARCHFLAGS := -DBYTE_ORDER=1234
 		else ifeq ($(MACHINE),ppc)
+			ARCHFLAGS := -DBYTE_ORDER=4321
+		else ifeq ($(MACHINE),sparc64)
 			ARCHFLAGS := -DBYTE_ORDER=4321
 		endif
 		DLL := so
@@ -112,11 +114,11 @@ DLLS_DBG      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDI
 # Platform-specific stuff:
 ifeq ($(PLATFORM),lin)
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -Wconversion -Wenum-compare -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds $(EXTRA_CFLAGS) -I.
+		CFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -Wconversion -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds $(EXTRA_CFLAGS) -I.
 	endif
 	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -Wno-variadic-macros -Wconversion -Wenum-compare -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds -std=c++98 $(EXTRA_CPPFLAGS) -I.
+		CPPFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -Wno-variadic-macros -Wconversion -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds -std=c++98 $(EXTRA_CPPFLAGS) -I.
 	endif
 	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(TYPE),lib)
