@@ -95,6 +95,7 @@ typedef unsigned int       bitfield;
 #define swap16(x) ((uint16)((((x) & 0x00FF) << 8) | (((x) >> 8) & 0x00FF)))
 
 // The C standard requires this two-level indirection thing
+#undef CONCAT
 #define CONCAT_INTERNAL(x, y) x ## y
 #define CONCAT(x, y) CONCAT_INTERNAL(x, y)
 
