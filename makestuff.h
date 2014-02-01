@@ -60,7 +60,9 @@
 typedef unsigned char      uint8;
 typedef unsigned short     uint16;
 #ifndef __cplusplus
-	typedef unsigned long long uint64;
+	#ifndef SDCC
+		typedef unsigned long long uint64;
+	#endif
 #endif
 
 typedef signed char        int8;
@@ -77,7 +79,9 @@ typedef signed short       int16;
 #endif
 
 #ifndef __cplusplus
-	typedef signed long long   int64;
+	#ifndef SDCC
+		typedef signed long long int64;
+	#endif
 #endif
 
 typedef unsigned int       bitfield;
