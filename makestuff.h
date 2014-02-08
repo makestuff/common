@@ -38,8 +38,10 @@
 	#define PFSZD "%Iu"
 	#ifdef _WIN64
 		#define PFSZH "%016IX"
+		#define WORD_LENGTH 64
 	#else
 		#define PFSZH "%08IX"
+		#define WORD_LENGTH 32
 	#endif
 #else
 	#define WINAPI
@@ -48,8 +50,10 @@
 	#define PFSZD "%zu"
 	#ifdef __LP64__
 		#define PFSZH "%016zX"
+		#define WORD_LENGTH 64
 	#else
 		#define PFSZH "%08zX"
+		#define WORD_LENGTH 32
 	#endif
 #endif
 
