@@ -98,7 +98,9 @@ typedef unsigned int       bitfield;
 	#endif
 	unsigned long  __cdecl _byteswap_ulong(unsigned long);
 	#define swap32(x) _byteswap_ulong(x)
-#define inline __inline
+	#ifndef __cplusplus
+		#define inline __inline
+	#endif
 #endif
 #define swap16(x) ((uint16)((((x) & 0x00FF) << 8) | (((x) >> 8) & 0x00FF)))
 
