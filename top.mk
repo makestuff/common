@@ -81,7 +81,9 @@ endif
 
 # Config-agnostic defines:
 CWD       := $(subst $(ROOT),$${ROOT},$(realpath .))
-LOCALNAME := $(notdir $(CWD))
+ifeq ($(strip $(LOCALNAME)),)
+	LOCALNAME := $(notdir $(CWD))
+endif
 INCLUDES  := -I$(ROOT)/common $(subst $${ROOT},$(ROOT),$(EXTRA_INCS) $(shell for i in $(DEPS:%=$(ROOT)/libs/lib%/$(PM)/incs.txt); do cat $$i 2>/dev/null; done))
 ifeq ($(strip $(CC_SRCS)),)
 	CC_SRCS   := $(wildcard *.c) $(foreach ESD,$(EXTRA_SRC_DIRS),$(wildcard $(ESD)/*.c)) $(EXTRA_CC_SRCS)
@@ -113,12 +115,21 @@ DLLS_DBG      := $(foreach DEP,$(DEPS),$(wildcard $(ROOT)/libs/lib$(DEP)/$(OUTDI
 
 # Platform-specific stuff:
 ifeq ($(PLATFORM),lin)
+	ifeq ($(strip $(ALIASING)),)
+		ALIASING := -Wstrict-aliasing=3 -fstrict-aliasing
+	endif
+	ifeq ($(strip $(CSTD)),)
+		CSTD := c99
+	endif
+	ifeq ($(strip $(CPPSTD)),)
+		CPPSTD := c++98
+	endif
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds $(EXTRA_CFLAGS) -I.
+		CFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -pedantic -std=$(CSTD) -Wstrict-prototypes -Wno-missing-field-initializers $(ALIASING) -Warray-bounds $(EXTRA_CFLAGS) -I.
 	endif
 	CLINE = $(CFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -Wno-variadic-macros -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -Warray-bounds -std=c++98 $(EXTRA_CPPFLAGS) -I.
+		CPPFLAGS := -c $(ARCHFLAGS) -Wall -Wextra -Wundef -Wno-variadic-macros -pedantic $(ALIASING) -Warray-bounds -std=$(CPPSTD) $(EXTRA_CPPFLAGS) -I.
 	endif
 	CPPLINE = $(CPPFLAGS) $(INCLUDES) -MMD -MP -MF $@.d -Wa,-adhlns=$@.lst $< -o $@
 	ifeq ($(TYPE),lib)
@@ -181,12 +192,21 @@ ifeq ($(PLATFORM),lin)
 		CPP_DBG      = g++ -g -D_DEBUG $(TESTINCS) $(CPPLINE)
 	endif
 else ifeq ($(PLATFORM),osx)
+	ifeq ($(strip $(ALIASING)),)
+		ALIASING := -Wstrict-aliasing=3 -fstrict-aliasing
+	endif
+	ifeq ($(strip $(CSTD)),)
+		CSTD := c99
+	endif
+	ifeq ($(strip $(CPPSTD)),)
+		CPPSTD := c++98
+	endif
 	ifeq ($(strip $(CFLAGS)),)
-		CFLAGS := -c -arch i386 -arch x86_64 -DBYTE_ORDER=1234 -Wall -Wextra -Wundef -pedantic-errors -std=c99 -Wstrict-prototypes -Wno-missing-field-initializers -Wstrict-aliasing=3 -fstrict-aliasing $(EXTRA_CFLAGS) -I.
+		CFLAGS := -c -arch i386 -arch x86_64 -DBYTE_ORDER=1234 -Wall -Wextra -Wundef -pedantic -std=$(CSTD) -Wstrict-prototypes -Wno-missing-field-initializers $(ALIASING) $(EXTRA_CFLAGS) -I.
 	endif
 	CLINE = $(CFLAGS) $(INCLUDES) -o $@ $<
 	ifeq ($(strip $(CPPFLAGS)),)
-		CPPFLAGS := -c -arch i386 -arch x86_64 -DBYTE_ORDER=1234 -Wall -Wextra -Wundef -Wno-variadic-macros -pedantic-errors -Wstrict-aliasing=3 -fstrict-aliasing -std=c++98 $(EXTRA_CPPFLAGS) -I.
+		CPPFLAGS := -c -arch i386 -arch x86_64 -DBYTE_ORDER=1234 -Wall -Wextra -Wundef -Wno-variadic-macros -pedantic $(ALIASING) -std=$(CPPSTD) $(EXTRA_CPPFLAGS) -I.
 	endif
 	CPPLINE = $(CPPFLAGS) $(INCLUDES) -o $@ $<
 	ifeq ($(TYPE),lib)
