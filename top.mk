@@ -397,7 +397,7 @@ $(OBJDIR_DBG)/%.$(OBJ) : %.c
 $(OBJDIR_DBG)/%.$(OBJ) : %.cpp
 	$(CPP_DBG)
 
-FX2LIB_VER := 20130701
+FX2LIB_VER := 20140310
 
 $(ROOT)/3rd/fx2lib:
 	@echo Fetching makestuff/fx2lib/$(FX2LIB_VER) from GitHub...
