@@ -378,13 +378,13 @@ else ifeq ($(PLATFORM),mingw)
 	else ifeq ($(TYPE),dll)
 		TARGET      := $(LOCALNAME).dll
 		GENLIBS_REL := echo '-L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%)'
-		LINK1_REL   := gcc -shared $(ARCHFLAGS) -Wl,-soname,$(TARGET),-rpath,\$$ORIGIN -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(subst $${ROOT},$(ROOT),$(shell $(GENDEPS_REL))) $(LINK_EXTRALIBS_REL)
+		LINK1_REL   := gcc -shared $(ARCHFLAGS) -Wl,-soname,$(TARGET),-rpath,\$$ORIGIN,--output-def,$(OUTDIR_REL)/$(LOCALNAME).def -o $(OUTDIR_REL)/$(TARGET) $(OBJS_REL) $(subst $${ROOT},$(ROOT),$(shell $(GENDEPS_REL))) $(LINK_EXTRALIBS_REL)
 		LINK2_REL   := for i in $(DLLS_REL); do cp -rp $$i $(OUTDIR_REL); done
 		LINK3_REL   :=
 		CC_REL       = gcc -O3 -DNDEBUG $(CLINE)
 		CPP_REL      = g++ -O3 -DNDEBUG $(CPPLINE)
 		GENLIBS_DBG := echo '-L$(CWD)/$(OUTDIR_DBG) -l$(LOCALNAME:lib%=%)'
-		LINK1_DBG   := gcc -shared $(ARCHFLAGS) -Wl,-soname,$(TARGET),-rpath,\$$ORIGIN -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(subst $${ROOT},$(ROOT),$(shell $(GENDEPS_DBG))) $(LINK_EXTRALIBS_DBG)
+		LINK1_DBG   := gcc -shared $(ARCHFLAGS) -Wl,-soname,$(TARGET),-rpath,\$$ORIGIN,--output-def,$(OUTDIR_DBG)/$(LOCALNAME).def -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(subst $${ROOT},$(ROOT),$(shell $(GENDEPS_DBG))) $(LINK_EXTRALIBS_DBG)
 		LINK2_DBG   := for i in $(DLLS_DBG); do cp -rp $$i $(OUTDIR_DBG); done
 		LINK3_DBG   :=
 		CC_DBG       = gcc -g -D_DEBUG $(CLINE)
