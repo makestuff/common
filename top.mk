@@ -493,12 +493,12 @@ $(ROOT)/3rd/fx2lib:
 	rm fx2lib.tgz
 	mv fx2lib-$(FX2LIB_VER) $(ROOT)/3rd/fx2lib
 
-$(ROOT)/3rd/libusbx-%-win:
-	@echo Fetching libusbx Windows binary from SourceForge...
-	wget -qO libusbx-1.0.7z --no-check-certificate 'http://sourceforge.net/projects/libusbx/files/releases/$(patsubst libusbx-%-win,%,$(@F))/Windows/$(@F).7z/download'
+$(ROOT)/3rd/libusb-%-win:
+	@echo Fetching libusb Windows binary from SourceForge...
+	wget -qO libusb-1.0.7z --no-check-certificate 'http://sourceforge.net/projects/libusb/files/libusb-1.0/$(patsubst libusb-%-win,libusb-%,$(@F))/$(@F).7z/download'
 	mkdir -p $@
-	7za x -o$@ libusbx-1.0.7z
-	rm -f libusbx-1.0.7z
+	7za x -o$@ libusb-1.0.7z
+	rm -f libusb-1.0.7z
 
 $(ROOT)/3rd/libusb-win32-bin-%:
 	@echo Fetching libusb-win32 from SourceForge...
