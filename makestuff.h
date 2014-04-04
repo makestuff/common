@@ -44,7 +44,6 @@
 		#define WORD_LENGTH 32
 	#endif
 #else
-	#define WINAPI
 	#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 	#define DLLEXPORT(t) t
 	#define PFSZD "%zu"
