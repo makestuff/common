@@ -231,8 +231,8 @@ else ifeq ($(PLATFORM),osx)
 		LINK1_DBG   := libtool -static -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG)
 		LINK2_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
 		LINK3_DBG   :=
-		CC_DBG       = gcc -fPIC -gstabs+ -D_DEBUG $(CLINE)
-		CPP_DBG      = g++ -fPIC -gstabs+ -D_DEBUG $(CPPLINE)
+		CC_DBG       = gcc -fPIC -D_DEBUG $(CLINE)
+		CPP_DBG      = g++ -fPIC -D_DEBUG $(CPPLINE)
 	else ifeq ($(TYPE),dll)
 		TARGET      := $(LOCALNAME).dylib
 		GENLIBS_REL := echo '-L$(CWD)/$(OUTDIR_REL) -l$(LOCALNAME:lib%=%)'
@@ -245,8 +245,8 @@ else ifeq ($(PLATFORM),osx)
 		LINK1_DBG   := gcc -dynamiclib -arch i386 -arch x86_64 -Wl,-install_name,@rpath/$(TARGET) -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(subst $${ROOT},$(ROOT),$(shell $(GENDEPS_DBG))) $(LINK_EXTRALIBS_DBG)
 		LINK2_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
 		LINK3_DBG   :=
-		CC_DBG       = gcc -fPIC -gstabs+ -D_DEBUG $(CLINE)
-		CPP_DBG      = g++ -fPIC -gstabs+ -D_DEBUG $(CPPLINE)
+		CC_DBG       = gcc -fPIC -D_DEBUG $(CLINE)
+		CPP_DBG      = g++ -fPIC -D_DEBUG $(CPPLINE)
 	else ifeq ($(TYPE),exe)
 		ifneq (,$(findstring tests,$(LOCALNAME)))
 			TESTINCS     := $(shell cat ../$(PM)/incs.txt 2>/dev/null) -I$(ROOT)/libs/libutpp
@@ -275,8 +275,8 @@ else ifeq ($(PLATFORM),osx)
 		LINK1_DBG   := for i in $(DLLS_DBG); do cp $$i $(OUTDIR_DBG); done
 		LINK2_DBG   := $(if $(strip $(CPP_SRCS)),g++,gcc) -arch i386 -arch x86_64 -Wl,-rpath,@loader_path/ -o $(OUTDIR_DBG)/$(TARGET) $(OBJS_DBG) $(TESTOBJS_DBG) $(subst $${ROOT},$(ROOT),$(shell $(GENDEPS_DBG))) $(LINK_EXTRALIBS_DBG)
 		LINK3_DBG   :=
-		CC_DBG       = gcc -gstabs+ -D_DEBUG $(TESTINCS) $(CLINE)
-		CPP_DBG      = g++ -gstabs+ -D_DEBUG $(TESTINCS) $(CPPLINE)
+		CC_DBG       = gcc -D_DEBUG $(TESTINCS) $(CLINE)
+		CPP_DBG      = g++ -D_DEBUG $(TESTINCS) $(CPPLINE)
 	endif
 else ifeq ($(PLATFORM),msvc)
 	ifeq ($(strip $(CFLAGS)),)
