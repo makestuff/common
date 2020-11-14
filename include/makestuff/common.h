@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MAKESTUFF_H
-#define MAKESTUFF_H
+#ifndef MAKESTUFF_COMMON_H
+#define MAKESTUFF_COMMON_H
 
 #include <stddef.h>
 
@@ -115,11 +115,16 @@ typedef unsigned int       bitfield;
 #define VA_EXPAND(x) x
 #define VA_NARGS(...) VA_EXPAND(VA_NARGS_INTERNAL(__VA_ARGS__, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3, 2, 1))
 #define VA_NARGS_INTERNAL(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, N, ...) N
-#define FAIL(code, label) { retVal = code; goto label; }
+
+#define FAIL_INTERNAL2(code, label) { retVal = code; goto label; }
+#define FAIL_INTERNAL3(code, label, prefix) LIBERROR_IS_REQUIRED
+#define FAIL_INTERNAL4(code, label, prefix, arg) FAIL_INTERNAL5(code, label, prefix, arg)
+#define FAIL_INTERNAL5(code, label, ...) LIBERROR_IS_REQUIRED
+#define FAIL_RET(...) VA_EXPAND(CONCAT(FAIL_INTERNAL, VA_NARGS(__VA_ARGS__))(__VA_ARGS__))
 
 // The CHECK_STATUS() macro - if condition is true, set a returnCode and jump to a label (exit,
 // cleanup etc). If liberror is included you can also give an error message.
-#define CHECK_INTERNAL3(condition, code, label) if ( condition ) { FAIL(code, label); }
+#define CHECK_INTERNAL3(condition, code, label) if ( condition ) { FAIL_RET(code, label); }
 #define CHECK_INTERNAL4(condition, code, label, prefix) LIBERROR_IS_REQUIRED
 #define CHECK_INTERNAL5(condition, code, label, ...) LIBERROR_IS_REQUIRED
 #define CHECK_STATUS(...) VA_EXPAND(CONCAT(CHECK_INTERNAL, VA_NARGS(__VA_ARGS__))(__VA_ARGS__))
