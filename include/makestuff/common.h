@@ -21,7 +21,7 @@
 #include <stddef.h>
 
 #ifndef __cplusplus
-	#ifdef WIN32
+	#ifdef _MSC_VER
 		typedef char bool;
 		enum {
 			false = 0,
@@ -32,7 +32,7 @@
 	#endif
 #endif
 
-#ifdef WIN32
+#ifdef _MSC_VER
 	#define WARN_UNUSED_RESULT
 	#define DLLEXPORT(t) __declspec(dllexport) t __stdcall
 	#define PFSZD "%Iu"
