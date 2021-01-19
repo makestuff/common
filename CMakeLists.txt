@@ -8,3 +8,13 @@ target_include_directories(${PROJECT_NAME} INTERFACE include)
 
 # What to install
 install(DIRECTORY include/makestuff DESTINATION include)
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/common.pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/common.pc
+@ONLY)
+
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/common.pc
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
